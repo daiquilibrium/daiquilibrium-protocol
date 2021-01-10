@@ -28,8 +28,8 @@ contract PoolGetters is PoolState {
      * Global
      */
 
-    function usdc() public view returns (address) {
-        return Constants.getUsdcAddress();
+    function dai() public view returns (address) {
+        return Constants.getDAIAddress();
     }
 
     function dao() public view returns (IDAO) {

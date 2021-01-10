@@ -71,6 +71,10 @@ contract Getters is State {
         return _state.provider.pool;
     }
 
+    function dai() public view returns (IERC20) {
+        return IERC20(Constants.getDAIAddress());
+    }
+
     function totalBonded() public view returns (uint256) {
         return _state.balance.bonded;
     }

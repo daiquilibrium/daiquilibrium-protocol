@@ -24,16 +24,16 @@ import "../external/Decimal.sol";
 contract MockOracle is Oracle {
     Decimal.D256 private _latestPrice;
     bool private _latestValid;
-    address private _usdc;
+    address private _dai;
 
-    constructor (address pair, address dollar, address usdc) Oracle(dollar) public {
+    constructor (address pair, address dollar, address dai) Oracle(dollar) public {
         _pair = IUniswapV2Pair(pair);
         _index = 0;
-        _usdc = usdc;
+        _dai = dai;
     }
 
-    function usdc() internal view returns (address) {
-        return _usdc;
+    function dai() internal view returns (address) {
+        return _dai;
     }
 
     function capture() public returns (Decimal.D256 memory, bool) {

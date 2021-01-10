@@ -24,7 +24,6 @@ import '../external/UniswapV2Library.sol';
 import "../external/Require.sol";
 import "../external/Decimal.sol";
 import "./IOracle.sol";
-import "./IUSDC.sol";
 import "../Constants.sol";
 
 contract Oracle is IOracle {
@@ -50,7 +49,7 @@ contract Oracle is IOracle {
     }
 
     function setup() public onlyDao {
-        _pair = IUniswapV2Pair(IUniswapV2Factory(UNISWAP_FACTORY).createPair(_dollar, usdc()));
+        _pair = IUniswapV2Pair(IUniswapV2Factory(UNISWAP_FACTORY).createPair(_dollar, dai()));
 
         (address token0, address token1) = (_pair.token0(), _pair.token1());
         _index = _dollar == token0 ? 0 : 1;
@@ -95,16 +94,12 @@ contract Oracle is IOracle {
     function updateOracle() private returns (Decimal.D256 memory, bool) {
         Decimal.D256 memory price = updatePrice();
         uint256 lastReserve = updateReserve();
-        bool isBlacklisted = IUSDC(usdc()).isBlacklisted(address(_pair));
 
         bool valid = true;
         if (lastReserve < Constants.getOracleReserveMinimum()) {
             valid = false;
         }
         if (_reserve < Constants.getOracleReserveMinimum()) {
-            valid = false;
-        }
-        if (isBlacklisted) {
             valid = false;
         }
 
@@ -121,7 +116,7 @@ contract Oracle is IOracle {
         _timestamp = blockTimestamp;
         _cumulative = priceCumulative;
 
-        return price.mul(1e12);
+        return price;
     }
 
     function updateReserve() private returns (uint256) {
@@ -132,8 +127,8 @@ contract Oracle is IOracle {
         return lastReserve;
     }
 
-    function usdc() internal view returns (address) {
-        return Constants.getUsdcAddress();
+    function dai() internal view returns (address) {
+        return Constants.getDAIAddress();
     }
 
     function pair() external view returns (address) {

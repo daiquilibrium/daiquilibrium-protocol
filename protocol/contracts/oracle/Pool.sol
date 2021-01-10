@@ -40,7 +40,7 @@ contract Pool is PoolSetters, Liquidity {
     event Claim(address indexed account, uint256 value);
     event Bond(address indexed account, uint256 start, uint256 value);
     event Unbond(address indexed account, uint256 start, uint256 value, uint256 newClaimable);
-    event Provide(address indexed account, uint256 value, uint256 lessUsdc, uint256 newUniv2);
+    event Provide(address indexed account, uint256 value, uint256 lessDai, uint256 newUniv2);
 
     function deposit(uint256 value) external onlyFrozen(msg.sender) notPaused {
         univ2().transferFrom(msg.sender, address(this), value);
@@ -128,7 +128,7 @@ contract Pool is PoolSetters, Liquidity {
             "insufficient rewarded balance"
         );
 
-        (uint256 lessUsdc, uint256 newUniv2) = addLiquidity(value);
+        (uint256 lessDai, uint256 newUniv2) = addLiquidity(value);
 
         uint256 totalRewardedWithPhantom = totalRewarded().add(totalPhantom()).add(value);
         uint256 newPhantomFromBonded = totalRewardedWithPhantom.mul(newUniv2).div(totalBonded());
