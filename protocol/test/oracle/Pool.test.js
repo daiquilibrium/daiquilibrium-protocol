@@ -8,7 +8,7 @@ const MockToken = contract.fromArtifact('MockToken');
 const MockUniswapV2PairLiquidity = contract.fromArtifact('MockUniswapV2PairLiquidity');
 const MockSettableDAO = contract.fromArtifact('MockSettableDAO');
 
-const INITIAL_STAKE_MULTIPLE = new BN(10).pow(new BN(6)); // 100 DSD -> 100M DSDS
+const INITIAL_STAKE_MULTIPLE = new BN(10).pow(new BN(6)); // 100 DAIQ -> 100M DAIQS
 
 const FROZEN = new BN(0);
 const FLUID = new BN(1);
@@ -23,10 +23,10 @@ describe('Pool', function () {
   beforeEach(async function () {
     this.dao = await MockSettableDAO.new({from: ownerAddress, gas: 8000000});
     await this.dao.set(1);
-    this.dollar = await MockToken.new("Dynamic Set Dollar", "DSD", 18, {from: ownerAddress, gas: 8000000});
-    this.usdc = await MockToken.new("USD//C", "USDC", 18, {from: ownerAddress, gas: 8000000});
+    this.dollar = await MockToken.new("Daiquilibrium", "DAIQ", 18, {from: ownerAddress, gas: 8000000});
+    this.dai = await MockToken.new("DAI", "DAI", 18, {from: ownerAddress, gas: 8000000});
     this.univ2 = await MockUniswapV2PairLiquidity.new({from: ownerAddress, gas: 8000000});
-    this.pool = await MockPool.new(this.usdc.address, {from: ownerAddress, gas: 8000000});
+    this.pool = await MockPool.new(this.dao.address, this.dai.address, this.univ2.address, {from: ownerAddress, gas: 8000000});
     await this.pool.set(this.dao.address, this.dollar.address, this.univ2.address);
   });
 
@@ -817,7 +817,7 @@ describe('Pool', function () {
         await this.pool.deposit(1000, {from: userAddress});
         await this.pool.bond(1000, {from: userAddress});
 
-        this.poolLockupEpochs = 5;
+        this.poolLockupEpochs = 12;
         for (var i = 0; i < this.poolLockupEpochs; i++) {
           await incrementEpoch(this.dao);
         }
@@ -835,8 +835,8 @@ describe('Pool', function () {
         const phantomAfterNewBonded = phantomAfterLessReward.add(new BN(10).mul(INITIAL_STAKE_MULTIPLE).addn(10));
 
         beforeEach(async function () {
-          await this.usdc.mint(userAddress, 1000);
-          await this.usdc.approve(this.pool.address, 1000, {from: userAddress});
+          await this.dai.mint(userAddress, 1000);
+          await this.dai.approve(this.pool.address, 1000, {from: userAddress});
 
           await this.univ2.set(1000, 1000, 10);
 
@@ -872,7 +872,7 @@ describe('Pool', function () {
           });
 
           expect(event.args.value).to.be.bignumber.equal(new BN(1000));
-          expect(event.args.lessUsdc).to.be.bignumber.equal(new BN(1000));
+          expect(event.args.lessDai).to.be.bignumber.equal(new BN(1000));
           expect(event.args.newUniv2).to.be.bignumber.equal(new BN(10));
         });
       });
@@ -883,8 +883,8 @@ describe('Pool', function () {
         const totalPhantom = phantomAfterNewBonded.add(new BN(1000).mul(INITIAL_STAKE_MULTIPLE).addn(1000));
 
         beforeEach(async function () {
-          await this.usdc.mint(userAddress, 3000);
-          await this.usdc.approve(this.pool.address, 3000, {from: userAddress});
+          await this.dai.mint(userAddress, 3000);
+          await this.dai.approve(this.pool.address, 3000, {from: userAddress});
 
           await this.univ2.faucet(userAddress1, 1000);
           await this.univ2.approve(this.pool.address, 1000, {from: userAddress1});
@@ -894,7 +894,7 @@ describe('Pool', function () {
           await incrementEpoch(this.dao);
           await this.dollar.mint(this.pool.address, 1000);
 
-          // 1000 DSD + 3000 USDC
+          // 1000 DSD + 3000 dai
           await this.univ2.set(1000, 3000, 10);
 
           this.result = await this.pool.provide(1000, {from: userAddress});
@@ -929,7 +929,7 @@ describe('Pool', function () {
           });
 
           expect(event.args.value).to.be.bignumber.equal(new BN(1000));
-          expect(event.args.lessUsdc).to.be.bignumber.equal(new BN(3000));
+          expect(event.args.lessDai).to.be.bignumber.equal(new BN(3000));
           expect(event.args.newUniv2).to.be.bignumber.equal(new BN(10));
         });
       });
@@ -951,8 +951,10 @@ describe('Pool', function () {
     });
 
     describe('when deposit', function () {
-      it('reverts', async function () {
-        await expectRevert(this.pool.deposit(1000, {from: userAddress}), "Pool: Not frozen");
+      it('completes', async function () {
+        await this.univ2.faucet(userAddress, 1000);
+        await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
+        await this.pool.deposit(1000, {from: userAddress});
       });
     });
 

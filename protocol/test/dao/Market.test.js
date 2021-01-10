@@ -127,14 +127,14 @@ describe('Market', function () {
     describe('before redeemable', function () {
       describe('same epoch', function () {
         it('reverts', async function () {
-          await expectRevert(this.market.redeemCoupons(1, 100000, {from: userAddress}), "Market: Too early to redeem");
+          await expectRevert(this.market.redeemCoupons(1, 100000, 0, {from: userAddress}), "Market: Too early to redeem");
         });
       });
 
       describe('next epoch', function () {
         it('reverts', async function () {
           await this.market.incrementEpochE();
-          await expectRevert(this.market.redeemCoupons(1, 100000, {from: userAddress}), "Market: Too early to redeem");
+          await expectRevert(this.market.redeemCoupons(1, 100000, 0, {from: userAddress}), "Market: Too early to redeem");
         });
       });
     });
@@ -147,13 +147,13 @@ describe('Market', function () {
 
       describe('not enough coupon balance', function () {
         it('reverts', async function () {
-          await expectRevert(this.market.redeemCoupons(1, 200000, {from: userAddress}), "Market: Insufficient coupon balance");
+          await expectRevert(this.market.redeemCoupons(1, 200000, 0, {from: userAddress}), "Market: Insufficient coupon balance");
         });
       });
 
       describe('on single call', function () {
         beforeEach(async function () {
-          this.result = await this.market.redeemCoupons(1, 100000, {from: userAddress});
+          this.result = await this.market.redeemCoupons(1, 100000, 0, {from: userAddress});
           this.txHash = this.result.tx;
         });
 
@@ -181,8 +181,8 @@ describe('Market', function () {
 
       describe('multiple calls', function () {
         beforeEach(async function () {
-          this.result = await this.market.redeemCoupons(1, 30000, {from: userAddress});
-          this.result = await this.market.redeemCoupons(1, 50000, {from: userAddress});
+          this.result = await this.market.redeemCoupons(1, 30000, 0, {from: userAddress});
+          this.result = await this.market.redeemCoupons(1, 50000, 0, {from: userAddress});
           this.txHash = this.result.tx;
         });
 
@@ -210,17 +210,17 @@ describe('Market', function () {
     });
 
     describe('after expired', function () {
-      this.timeout(30000);
+      this.timeout(100000);
 
       beforeEach(async function () {
-        for (let i = 0; i < 90; i++) {
+        for (let i = 0; i < 360; i++) {
           await this.market.incrementEpochE();
         }
         await this.market.stepE();
       });
 
       it('reverts', async function () {
-        await expectRevert(this.market.redeemCoupons(1, 100000, {from: userAddress}), "Market: Insufficient coupon balance");
+        await expectRevert(this.market.redeemCoupons(1, 100000, 0, {from: userAddress}), "Market: Insufficient coupon balance");
       });
     });
   });
@@ -373,14 +373,14 @@ describe('Market', function () {
 
     describe('on call without expiration', function () {
       it('initializes coupon expiry', async function () {
-        expect(await this.market.couponsExpiration(2)).to.be.bignumber.equal(new BN(92));
-        expect(await this.market.expiringCoupons(92)).to.be.bignumber.equal(new BN(1));
-        expect(await this.market.expiringCouponsAtIndex(92, 0)).to.be.bignumber.equal(new BN(2));
+        expect(await this.market.couponsExpiration(2)).to.be.bignumber.equal(new BN(362));
+        expect(await this.market.expiringCoupons(362)).to.be.bignumber.equal(new BN(1));
+        expect(await this.market.expiringCouponsAtIndex(362, 0)).to.be.bignumber.equal(new BN(2));
       });
     });
 
     describe('on call with expiration', function () {
-      this.timeout(30000);
+      this.timeout(100000);
 
       beforeEach(async function () {
         await this.market.incrementTotalDebtE(100000);
@@ -389,7 +389,7 @@ describe('Market', function () {
         await this.market.incrementEpochE();
         await this.market.stepE();
 
-        for (let i = 0; i < 89; i++) {
+        for (let i = 0; i < 359; i++) {
           await this.market.incrementEpochE();
         }
         this.result = await this.market.stepE();
@@ -407,7 +407,7 @@ describe('Market', function () {
     });
 
     describe('on call with all reclaimed no bonded', function () {
-      this.timeout(30000);
+      this.timeout(100000);
 
       beforeEach(async function () {
         await this.market.incrementTotalDebtE(100000);
@@ -419,7 +419,7 @@ describe('Market', function () {
         await this.market.incrementEpochE();
         this.result = await this.market.stepE();
 
-        for (let i = 0; i < 89; i++) {
+        for (let i = 0; i < 359; i++) {
           await this.market.incrementEpochE();
         }
         this.result = await this.market.stepE();
@@ -444,7 +444,7 @@ describe('Market', function () {
       });
 
       describe('on call with all reclaimed', function () {
-        this.timeout(30000);
+        this.timeout(100000);
 
         beforeEach(async function () {
           await this.market.incrementTotalDebtE(100000);
@@ -456,7 +456,7 @@ describe('Market', function () {
           await this.market.incrementEpochE();
           this.result = await this.market.stepE();
 
-          for (let i = 0; i < 89; i++) {
+          for (let i = 0; i < 359; i++) {
             await this.market.incrementEpochE();
           }
           this.result = await this.market.stepE();
@@ -475,7 +475,7 @@ describe('Market', function () {
       });
 
       describe('on call with some reclaimed', function () {
-        this.timeout(30000);
+        this.timeout(100000);
 
         beforeEach(async function () {
           await this.market.incrementTotalDebtE(100000);
@@ -489,7 +489,7 @@ describe('Market', function () {
 
           this.result = await this.market.stepE();
 
-          for (let i = 0; i < 89; i++) {
+          for (let i = 0; i < 359; i++) {
             await this.market.incrementEpochE();
           }
           this.result = await this.market.stepE();
@@ -507,7 +507,7 @@ describe('Market', function () {
       });
 
       describe('reclaimed some debt', function () {
-        this.timeout(30000);
+        this.timeout(100000);
 
         beforeEach(async function () {
           await this.market.incrementTotalDebtE(150000);
@@ -521,7 +521,7 @@ describe('Market', function () {
 
           this.result = await this.market.stepE();
 
-          for (let i = 0; i < 89; i++) {
+          for (let i = 0; i < 359; i++) {
             await this.market.incrementEpochE();
           }
           this.result = await this.market.stepE();
@@ -539,7 +539,7 @@ describe('Market', function () {
       });
 
       describe('reclaimed all debt and some bonded', function () {
-        this.timeout(30000);
+        this.timeout(100000);
 
         beforeEach(async function () {
           await this.market.incrementTotalDebtE(120000);
@@ -553,7 +553,7 @@ describe('Market', function () {
 
           this.result = await this.market.stepE();
 
-          for (let i = 0; i < 89; i++) {
+          for (let i = 0; i < 359; i++) {
             await this.market.incrementEpochE();
           }
           this.result = await this.market.stepE();

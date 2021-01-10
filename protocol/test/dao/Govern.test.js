@@ -8,7 +8,7 @@ const MockGovern = contract.fromArtifact('MockGovern');
 const MockImplA = contract.fromArtifact('MockImplA');
 const MockImplB = contract.fromArtifact('MockImplB');
 
-const VOTE_PERIOD = 9;
+const VOTE_PERIOD = 21;
 const EMERGENCY_COMMIT_PERIOD = 6;
 
 const UNDECIDED = new BN(0);
@@ -256,9 +256,9 @@ describe('Govern', function () {
 
   describe('commit', function () {
     beforeEach(async function () {
-      await this.govern.incrementBalanceOfE(userAddress, INITIAL_STAKE_MULTIPLE.muln(2500));
-      await this.govern.incrementBalanceOfE(userAddress2, INITIAL_STAKE_MULTIPLE.muln(4000));
-      await this.govern.incrementBalanceOfE(userAddress3, INITIAL_STAKE_MULTIPLE.muln(3500));
+      await this.govern.incrementBalanceOfE(userAddress, INITIAL_STAKE_MULTIPLE.muln(1500));
+      await this.govern.incrementBalanceOfE(userAddress2, INITIAL_STAKE_MULTIPLE.muln(5500));
+      await this.govern.incrementBalanceOfE(userAddress3, INITIAL_STAKE_MULTIPLE.muln(3000));
       await this.govern.incrementTotalBondedE(10000);
     });
 
@@ -312,6 +312,8 @@ describe('Govern', function () {
     });
 
     describe('ends successfully', function () {
+      this.timeout(30000);
+
       beforeEach(async function () {
         await this.govern.vote(this.implB.address, REJECT, {from: userAddress});
         await this.govern.vote(this.implB.address, APPROVE, {from: userAddress2});

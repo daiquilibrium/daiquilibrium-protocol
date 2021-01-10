@@ -7,7 +7,7 @@ const MockPoolState = contract.fromArtifact('MockPoolState');
 const MockSettableDAO = contract.fromArtifact('MockSettableDAO');
 const MockToken = contract.fromArtifact('MockToken');
 
-describe('PollState', function () {
+describe('PoolState', function () {
   const [ ownerAddress, userAddress, userAddress2] = accounts;
 
   beforeEach(async function () {
@@ -239,7 +239,7 @@ describe('PollState', function () {
     describe('when called then advanced after lockup', function () {
       beforeEach('call', async function () {
         await this.setters.unfreezeE(userAddress);
-        await this.dao.set(5);
+        await this.dao.set(12);
       });
 
       it('is frozen', async function () {

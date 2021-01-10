@@ -24,7 +24,7 @@ const permit = [
 
 async function signPermit(dollar, privateKey, message) {
   const domainData = {
-    name: "Dynamic Set Dollar",
+    name: "Daiquilibrium",
     version: "1",
     chainId: "1",
     verifyingContract: dollar,

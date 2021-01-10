@@ -7,7 +7,7 @@ const { expect } = require('chai');
 const MockBonding = contract.fromArtifact('MockBonding');
 const Dollar = contract.fromArtifact('Dollar');
 
-const INITIAL_STAKE_MULTIPLE = new BN(10).pow(new BN(6)); // 100 DSD -> 100M DSDS
+const INITIAL_STAKE_MULTIPLE = new BN(10).pow(new BN(6)); // 100 DAIQ -> 100M DAIQS
 
 const FROZEN = new BN(0);
 const FLUID = new BN(1);
@@ -46,16 +46,16 @@ describe('Bonding', function () {
       });
 
       it('updates users balances', async function () {
-        expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.equal(new BN(0));
-        expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.equal(new BN(0));
+        expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.zero; 
+        expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.zero;
         expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.equal(new BN(1000));
-        expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.equal(new BN(0));
+        expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.zero;
       });
 
       it('updates dao balances', async function () {
         expect(await this.dollar.balanceOf(this.bonding.address)).to.be.bignumber.equal(new BN(1000));
-        expect(await this.bonding.totalSupply()).to.be.bignumber.equal(new BN(0));
-        expect(await this.bonding.totalBonded()).to.be.bignumber.equal(new BN(0));
+        expect(await this.bonding.totalSupply()).to.be.bignumber.zero;
+        expect(await this.bonding.totalBonded()).to.be.bignumber.zero;
         expect(await this.bonding.totalStaged()).to.be.bignumber.equal(new BN(1000));
       });
 
@@ -84,16 +84,16 @@ describe('Bonding', function () {
 
       it('updates users balances', async function () {
         expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.equal(new BN(1000));
-        expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.equal(new BN(0));
-        expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.equal(new BN(0));
-        expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.equal(new BN(0));
+        expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.zero;
+        expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.zero;
+        expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.zero;
       });
 
       it('updates dao balances', async function () {
-        expect(await this.dollar.balanceOf(this.bonding.address)).to.be.bignumber.equal(new BN(0));
-        expect(await this.bonding.totalSupply()).to.be.bignumber.equal(new BN(0));
-        expect(await this.bonding.totalBonded()).to.be.bignumber.equal(new BN(0));
-        expect(await this.bonding.totalStaged()).to.be.bignumber.equal(new BN(0));
+        expect(await this.dollar.balanceOf(this.bonding.address)).to.be.bignumber.zero;
+        expect(await this.bonding.totalSupply()).to.be.bignumber.zero;
+        expect(await this.bonding.totalBonded()).to.be.bignumber.zero;
+        expect(await this.bonding.totalStaged()).to.be.bignumber.zero;
       });
 
       it('emits Withdraw event', async function () {
@@ -137,9 +137,9 @@ describe('Bonding', function () {
         });
 
         it('updates users balances', async function () {
-          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.equal(new BN(0));
+          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.zero;
           expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.equal(new BN(1000).mul(INITIAL_STAKE_MULTIPLE));
-          expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.equal(new BN(0));
+          expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.zero;
           expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.equal(new BN(1000));
         });
 
@@ -147,7 +147,7 @@ describe('Bonding', function () {
           expect(await this.dollar.balanceOf(this.bonding.address)).to.be.bignumber.equal(new BN(1000));
           expect(await this.bonding.totalSupply()).to.be.bignumber.equal(new BN(1000).mul(INITIAL_STAKE_MULTIPLE));
           expect(await this.bonding.totalBonded()).to.be.bignumber.equal(new BN(1000));
-          expect(await this.bonding.totalStaged()).to.be.bignumber.equal(new BN(0));
+          expect(await this.bonding.totalStaged()).to.be.bignumber.zero;
         });
 
         it('emits Bond event', async function () {
@@ -303,16 +303,16 @@ describe('Bonding', function () {
         });
 
         it('updates users balances', async function () {
-          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.equal(new BN(0));
-          expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.equal(new BN(0));
+          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.zero;
+          expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.zero;
           expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.equal(new BN(1000));
-          expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.equal(new BN(0));
+          expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.zero;
         });
 
         it('updates dao balances', async function () {
           expect(await this.dollar.balanceOf(this.bonding.address)).to.be.bignumber.equal(new BN(1000));
-          expect(await this.bonding.totalSupply()).to.be.bignumber.equal(new BN(0));
-          expect(await this.bonding.totalBonded()).to.be.bignumber.equal(new BN(0));
+          expect(await this.bonding.totalSupply()).to.be.bignumber.zero;
+          expect(await this.bonding.totalBonded()).to.be.bignumber.zero;
           expect(await this.bonding.totalStaged()).to.be.bignumber.equal(new BN(1000));
         });
 
@@ -347,7 +347,7 @@ describe('Bonding', function () {
         });
 
         it('updates users balances', async function () {
-          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.equal(new BN(0));
+          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.zero;
           expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.equal(new BN(200).mul(INITIAL_STAKE_MULTIPLE));
           expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.equal(new BN(800));
           expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.equal(new BN(200));
@@ -393,6 +393,7 @@ describe('Bonding', function () {
           await this.bonding.bond(600, {from: userAddress1});
           await this.bonding.bond(400, {from: userAddress2});
 
+
           await this.bonding.incrementEpochE({from: userAddress});
           await this.bonding.mintToE(this.bonding.address, 1000);
           await this.bonding.incrementTotalBondedE(1000);
@@ -406,7 +407,7 @@ describe('Bonding', function () {
         });
 
         it('updates users balances', async function () {
-          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.equal(new BN(0));
+          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.zero;
           expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.equal(new BN(200).mul(INITIAL_STAKE_MULTIPLE));
           expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.equal(new BN(1200));
           expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.equal(new BN(300));
@@ -461,16 +462,16 @@ describe('Bonding', function () {
         });
 
         it('updates users balances', async function () {
-          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.equal(new BN(0));
-          expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.equal(new BN(0));
+          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.zero;
+          expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.zero;
           expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.equal(new BN(1000));
-          expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.equal(new BN(0));
+          expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.zero;
         });
 
         it('updates dao balances', async function () {
           expect(await this.dollar.balanceOf(this.bonding.address)).to.be.bignumber.equal(new BN(1000));
-          expect(await this.bonding.totalSupply()).to.be.bignumber.equal(new BN(0));
-          expect(await this.bonding.totalBonded()).to.be.bignumber.equal(new BN(0));
+          expect(await this.bonding.totalSupply()).to.be.bignumber.zero;
+          expect(await this.bonding.totalBonded()).to.be.bignumber.zero;
           expect(await this.bonding.totalStaged()).to.be.bignumber.equal(new BN(1000));
         });
 
@@ -505,7 +506,7 @@ describe('Bonding', function () {
         });
 
         it('updates users balances', async function () {
-          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.equal(new BN(0));
+          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.zero;
           expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.equal(new BN(200).mul(INITIAL_STAKE_MULTIPLE));
           expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.equal(new BN(800));
           expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.equal(new BN(200));
@@ -564,7 +565,7 @@ describe('Bonding', function () {
         });
 
         it('updates users balances', async function () {
-          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.equal(new BN(0));
+          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.zero;
           expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.equal(new BN(466666667));
           expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.equal(new BN(800));
           expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.equal(new BN(700));
@@ -613,8 +614,10 @@ describe('Bonding', function () {
     });
 
     describe('when deposit', function () {
-      it('reverts', async function () {
-        await expectRevert(this.bonding.deposit(1000, {from: userAddress}), "Permission: Not frozen");
+      it('completes', async function () {
+        await this.bonding.mintToE(userAddress, 1000);
+        await this.dollar.approve(this.bonding.address, 1000, {from: userAddress})
+        await this.bonding.deposit(1000, {from: userAddress});
       });
     });
 
@@ -635,9 +638,9 @@ describe('Bonding', function () {
       });
 
       it('updates users balances', async function () {
-        expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.equal(new BN(0));
+        expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.zero;
         expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.equal(new BN(1000).mul(INITIAL_STAKE_MULTIPLE));
-        expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.equal(new BN(0));
+        expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.zero;
         expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.equal(new BN(1000));
       });
 
@@ -645,7 +648,7 @@ describe('Bonding', function () {
         expect(await this.dollar.balanceOf(this.bonding.address)).to.be.bignumber.equal(new BN(1000));
         expect(await this.bonding.totalSupply()).to.be.bignumber.equal(new BN(1000).mul(INITIAL_STAKE_MULTIPLE));
         expect(await this.bonding.totalBonded()).to.be.bignumber.equal(new BN(1000));
-        expect(await this.bonding.totalStaged()).to.be.bignumber.equal(new BN(0));
+        expect(await this.bonding.totalStaged()).to.be.bignumber.zero;
       });
 
       it('emits Bond event', async function () {
@@ -679,16 +682,16 @@ describe('Bonding', function () {
       });
 
       it('updates users balances', async function () {
-        expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.equal(new BN(0));
-        expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.equal(new BN(0));
+        expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.zero;
+        expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.zero;
         expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.equal(new BN(1000));
-        expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.equal(new BN(0));
+        expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.zero;
       });
 
       it('updates dao balances', async function () {
         expect(await this.dollar.balanceOf(this.bonding.address)).to.be.bignumber.equal(new BN(1000));
-        expect(await this.bonding.totalSupply()).to.be.bignumber.equal(new BN(0));
-        expect(await this.bonding.totalBonded()).to.be.bignumber.equal(new BN(0));
+        expect(await this.bonding.totalSupply()).to.be.bignumber.zero;
+        expect(await this.bonding.totalBonded()).to.be.bignumber.zero;
         expect(await this.bonding.totalStaged()).to.be.bignumber.equal(new BN(1000));
       });
 
@@ -761,6 +764,7 @@ describe('Bonding', function () {
   });
 
   describe('when step', function () {
+    this.timeout(30000);
     beforeEach(async function () {
       /* Deposit and Bond User */
       await this.bonding.mintToE(userAddress, 1000);
@@ -790,11 +794,12 @@ describe('Bonding', function () {
       await time.increase(86400);
       await this.bonding.stepE({from: userAddress});
 
+       const balance = await this.bonding.balanceOfBonded(userAddress);
       /* Unbond User */
       await this.bonding.unbondUnderlying(2000, {from: userAddress});
 
-      await time.increase(86400);
-      for (var i = 0; i < 14; i++) {
+      await time.increase(86400 * 23);
+      for (var i = 0; i < 23; i++) {
         await this.bonding.stepE({from: userAddress});
       }
     });
@@ -805,12 +810,14 @@ describe('Bonding', function () {
       });
 
       it('is correct epoch', async function () {
-        expect(await this.bonding.epoch()).to.be.bignumber.equal(new BN(17));
+        expect(await this.bonding.epoch()).to.be.bignumber.equal(new BN(26));
+        expect(await this.bonding.epochTime()).bignumber.equal(new BN(26));
       });
     });
 
     describe ('after epoch lock cooldown', function() {
       beforeEach(async function () {
+        await time.increase(86400);
         await this.bonding.stepE({from: userAddress});
       });
 
@@ -819,11 +826,11 @@ describe('Bonding', function () {
       });
 
       it('is correct epoch', async function () {
-        expect(await this.bonding.epoch()).to.be.bignumber.equal(new BN(18));
+        expect(await this.bonding.epoch()).to.be.bignumber.equal(new BN(27));
       });
 
       it('has correct snapshots', async function () {
-        expect(await this.bonding.totalBondedAt(0)).to.be.bignumber.equal(new BN(0));
+        expect(await this.bonding.totalBondedAt(0)).to.be.bignumber.zero;
         expect(await this.bonding.totalBondedAt(1)).to.be.bignumber.equal(new BN(1000).mul(INITIAL_STAKE_MULTIPLE));
         expect(await this.bonding.totalBondedAt(2)).to.be.bignumber.equal(new BN(2000).mul(INITIAL_STAKE_MULTIPLE));
         expect(await this.bonding.totalBondedAt(3)).to.be.bignumber.equal(new BN(1000).mul(INITIAL_STAKE_MULTIPLE));
