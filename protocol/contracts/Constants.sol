@@ -28,22 +28,22 @@ library Constants {
     uint256 private constant BOOTSTRAPPING_PRICE = 154e16; // 1.54 USDC (targeting 4.5% inflation)
 
     /* Oracle */
-    address private constant USDC = address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
-    uint256 private constant ORACLE_RESERVE_MINIMUM = 1e10; // 10,000 USDC
+    address private constant DAI = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    uint256 private constant ORACLE_RESERVE_MINIMUM = 1e22; // 10,000 DAI
 
     /* Bonding */
-    uint256 private constant INITIAL_STAKE_MULTIPLE = 1e6; // 100 DSD -> 100M DSDS
+    uint256 private constant INITIAL_STAKE_MULTIPLE = 1e6; // 100 RFSD -> 100M DAIQS
 
     /* Epoch */
     struct EpochStrategy {
         uint256 offset;
-        uint256 start;
-        uint256 period;
+        uint256 minPeriod;
+        uint256 maxPeriod;
     }
 
-    uint256 private constant EPOCH_OFFSET = 0;
-    uint256 private constant EPOCH_START = 1606348800;
-    uint256 private constant EPOCH_PERIOD = 7200;
+    uint256 private constant EPOCH_OFFSET = 86400; //1 day
+    uint256 private constant EPOCH_MIN_PERIOD = 1800; //30 minutes
+    uint256 private constant EPOCH_MAX_PERIOD = 7200; //2 hours
 
     /* Governance */
     uint256 private constant GOVERNANCE_PERIOD = 36;
@@ -62,7 +62,6 @@ library Constants {
     uint256 private constant COUPON_EXPIRATION = 360;
     uint256 private constant DEBT_RATIO_CAP = 35e16; // 35%
     uint256 private constant INITIAL_COUPON_REDEMPTION_PENALTY = 50e16; // 50%
-    uint256 private constant COUPON_REDEMPTION_PENALTY_DECAY = 3600; // 1 hour
 
     /* Regulator */
     uint256 private constant SUPPLY_CHANGE_DIVISOR = 12e18; // 12
@@ -72,8 +71,8 @@ library Constants {
     /**
      * Getters
      */
-    function getUsdcAddress() internal pure returns (address) {
-        return USDC;
+    function getDAIAddress() internal pure returns (address) {
+        return DAI;
     }
 
     function getOracleReserveMinimum() internal pure returns (uint256) {
@@ -83,8 +82,8 @@ library Constants {
     function getEpochStrategy() internal pure returns (EpochStrategy memory) {
         return EpochStrategy({
             offset: EPOCH_OFFSET,
-            start: EPOCH_START,
-            period: EPOCH_PERIOD
+            minPeriod: EPOCH_MIN_PERIOD,
+            maxPeriod: EPOCH_MAX_PERIOD
         });
     }
 
@@ -140,8 +139,6 @@ library Constants {
         return Decimal.D256({value: INITIAL_COUPON_REDEMPTION_PENALTY});
     }
 
-    function getCouponRedemptionPenaltyDecay() internal pure returns (uint256) {
-        return COUPON_REDEMPTION_PENALTY_DECAY;
     }
 
     function getSupplyChangeLimit() internal pure returns (Decimal.D256 memory) {

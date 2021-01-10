@@ -41,9 +41,9 @@ contract Account {
 
 contract Epoch {
     struct Global {
-        uint256 start;
-        uint256 period;
         uint256 current;
+        uint256 currentStart;
+        uint256 currentPeriod;
     }
 
     struct Coupons {

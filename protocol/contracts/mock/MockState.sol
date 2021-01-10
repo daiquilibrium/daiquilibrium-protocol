@@ -99,8 +99,8 @@ contract MockState is Setters {
      */
 
     function setEpochParamsE(uint256 start, uint256 period) external {
-        _state.epoch.start = start;
-        _state.epoch.period = period;
+        _state.epoch.currentStart = start;
+        _state.epoch.currentPeriod = period;
     }
 
     function incrementEpochE() external {
@@ -161,9 +161,5 @@ contract MockState is Setters {
 
     function setBlockTimestamp(uint256 timestamp) external {
         _blockTimestamp = timestamp;
-    }
-
-    function blockTimestamp() internal view returns (uint256) {
-        return _blockTimestamp;
     }
 }

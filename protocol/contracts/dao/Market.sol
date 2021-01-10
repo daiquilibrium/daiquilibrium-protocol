@@ -67,17 +67,16 @@ contract Market is Comptroller, Curve {
     }
 
     function couponRedemptionPenalty(uint256 couponEpoch, uint256 couponAmount) public view returns (uint256) {
-        uint timeIntoEpoch = block.timestamp % Constants.getEpochStrategy().period;
+        uint timeIntoEpoch = timeInEpoch();
         uint couponAge = epoch() - couponEpoch;
 
-        uint couponEpochDecay = Constants.getCouponRedemptionPenaltyDecay() * (Constants.getCouponExpiration() - couponAge) / Constants.getCouponExpiration();
+        uint couponEpochDecay = currentEpochDuration().div(2) * (Constants.getCouponExpiration() - couponAge) / Constants.getCouponExpiration();
 
         if(timeIntoEpoch > couponEpochDecay) {
             return 0;
         }
 
         Decimal.D256 memory couponEpochInitialPenalty = Constants.getInitialCouponRedemptionPenalty().div(Decimal.D256({value: Constants.getCouponExpiration() })).mul(Decimal.D256({value: Constants.getCouponExpiration() - couponAge}));
-
         Decimal.D256 memory couponEpochDecayedPenalty = couponEpochInitialPenalty.div(Decimal.D256({value: couponEpochDecay})).mul(Decimal.D256({value: couponEpochDecay - timeIntoEpoch}));
 
         return Decimal.D256({value: couponAmount}).mul(couponEpochDecayedPenalty).value;

@@ -28,9 +28,9 @@ contract Comptroller is Setters {
 
     function mintToAccount(address account, uint256 amount) internal {
         dollar().mint(account, amount);
-        if (!bootstrappingAt(epoch())) {
+
+        if (!bootstrappingAt(epoch())) 
             increaseDebt(amount);
-        }
 
         balanceCheck();
     }
@@ -88,7 +88,7 @@ contract Comptroller is Setters {
             poolReward = newRedeemable.mul(Constants.getOraclePoolRatio()).div(100);
             // Determine Redeemable's final cut
             newRedeemable = newRedeemable.sub(poolReward);
-
+            
             mintToPool(poolReward);
             mintToRedeemable(newRedeemable);
 

@@ -131,8 +131,29 @@ contract Setters is State, Getters {
      * Epoch
      */
 
+    function initializeEpochs() internal {
+        _state.epoch.currentStart = block.timestamp;
+        _state.epoch.currentPeriod = Constants.getEpochStrategy().offset;
+    }
+
     function incrementEpoch() internal {
         _state.epoch.current = _state.epoch.current.add(1);
+        _state.epoch.currentStart = _state.epoch.currentStart.add(_state.epoch.currentPeriod);
+    }
+
+    function adjustPeriod(Decimal.D256 memory price) internal {
+        Decimal.D256 memory normalizedPrice;
+        if (price.greaterThan(Decimal.one())) 
+            normalizedPrice = Decimal.one().div(price);
+        else
+            normalizedPrice = price;
+        
+        Constants.EpochStrategy memory epochStrategy = Constants.getEpochStrategy();
+        
+        _state.epoch.currentPeriod = normalizedPrice
+            .mul(epochStrategy.maxPeriod.sub(epochStrategy.minPeriod))
+            .add(epochStrategy.minPeriod)
+            .asUint256();
     }
 
     function snapshotTotalBonded() internal {
