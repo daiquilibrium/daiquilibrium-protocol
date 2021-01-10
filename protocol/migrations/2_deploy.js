@@ -3,11 +3,11 @@ const Deployer2 = artifacts.require("Deployer2");
 const Deployer3 = artifacts.require("Deployer3");
 const Implementation = artifacts.require("Implementation");
 const Root = artifacts.require("Root");
-const TestnetUSDC = artifacts.require("TestnetUSDC");
+//const TestnetUSDC = artifacts.require("TestnetDai");
 
-async function deployTestnetUSDC(deployer) {
+/*async function deployTestnetDai(deployer) {
   await deployer.deploy(TestnetUSDC);
-}
+}*/
 
 async function deployTestnet(deployer) {
   const d1 = await deployer.deploy(Deployer1);
@@ -38,6 +38,7 @@ module.exports = function(deployer) {
         break;
       case 'rinkeby':
       case 'ropsten':
+      case 'kovan':
         await deployTestnet(deployer);
         break;
       default:
