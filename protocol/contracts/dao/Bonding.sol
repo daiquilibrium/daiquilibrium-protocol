@@ -44,7 +44,13 @@ contract Bonding is Setters, Permission {
         incrementEpoch();
     }
 
-    function deposit(uint256 value) external onlyFrozenOrLocked(msg.sender) {
+    function deposit(uint256 value) external {
+        Require.that(
+            value > 0,
+            FILE,
+            "Insufficient deposit amount"
+        );
+
         dollar().transferFrom(msg.sender, address(this), value);
         incrementBalanceOfStaged(msg.sender, value);
 
@@ -65,6 +71,7 @@ contract Bonding is Setters, Permission {
             value.mul(Constants.getInitialStakeMultiple()) :
             value.mul(totalSupply()).div(totalBonded());
         incrementBalanceOf(msg.sender, balance);
+
         incrementTotalBonded(value);
         decrementBalanceOfStaged(msg.sender, value, "Bonding: insufficient staged balance");
 

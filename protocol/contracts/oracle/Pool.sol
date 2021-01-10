@@ -42,7 +42,7 @@ contract Pool is PoolSetters, Liquidity {
     event Unbond(address indexed account, uint256 start, uint256 value, uint256 newClaimable);
     event Provide(address indexed account, uint256 value, uint256 lessDai, uint256 newUniv2);
 
-    function deposit(uint256 value) external onlyFrozen(msg.sender) notPaused {
+    function deposit(uint256 value) external onlyFrozenOrFluid(msg.sender) notPaused {
         univ2().transferFrom(msg.sender, address(this), value);
         incrementBalanceOfStaged(msg.sender, value);
 
@@ -139,7 +139,7 @@ contract Pool is PoolSetters, Liquidity {
 
         balanceCheck();
 
-        emit Provide(msg.sender, value, lessUsdc, newUniv2);
+        emit Provide(msg.sender, value, lessDai, newUniv2);
     }
 
     function emergencyWithdraw(address token, uint256 value) external onlyDao {
@@ -163,6 +163,16 @@ contract Pool is PoolSetters, Liquidity {
             statusOf(account) == PoolAccount.Status.Frozen,
             FILE,
             "Not frozen"
+        );
+
+        _;
+    }
+
+    modifier onlyFrozenOrFluid(address account) {
+        Require.that(
+            statusOf(account) == PoolAccount.Status.Frozen ||  statusOf(account) == PoolAccount.Status.Fluid,
+            FILE,
+            "Not frozen or fluid"
         );
 
         _;
