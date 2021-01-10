@@ -32,7 +32,7 @@ library Constants {
     uint256 private constant ORACLE_RESERVE_MINIMUM = 1e22; // 10,000 DAI
 
     /* Bonding */
-    uint256 private constant INITIAL_STAKE_MULTIPLE = 1e6; // 100 RFSD -> 100M DAIQS
+    uint256 private constant INITIAL_STAKE_MULTIPLE = 1e6; // 100 DAIQ -> 100M DAIQS
 
     /* Epoch */
     struct EpochStrategy {
@@ -46,27 +46,28 @@ library Constants {
     uint256 private constant EPOCH_MAX_PERIOD = 7200; //2 hours
 
     /* Governance */
-    uint256 private constant GOVERNANCE_PERIOD = 36;
-    uint256 private constant GOVERNANCE_QUORUM = 33e16; // 33%
+    uint256 private constant GOVERNANCE_PERIOD = 21;
+    uint256 private constant GOVERNANCE_QUORUM = 20e16; // 20%
     uint256 private constant GOVERNANCE_SUPER_MAJORITY = 66e16; // 66%
     uint256 private constant GOVERNANCE_EMERGENCY_DELAY = 6; // 6 epochs
 
     /* DAO */
     uint256 private constant DAI_ADVANCE_INCENTIVE_CAP = 150e18; //150 DAI
     uint256 private constant ADVANCE_INCENTIVE = 100e18; // 100 DAIQ
+    uint256 private constant DAO_EXIT_LOCKUP_EPOCHS = 24; // 24 epochs fluid
 
     /* Pool */
     uint256 private constant POOL_EXIT_LOCKUP_EPOCHS = 12; // 12 epochs fluid
 
     /* Market */
     uint256 private constant COUPON_EXPIRATION = 360;
-    uint256 private constant DEBT_RATIO_CAP = 35e16; // 35%
+    uint256 private constant DEBT_RATIO_CAP = 40e16; // 40%
     uint256 private constant INITIAL_COUPON_REDEMPTION_PENALTY = 50e16; // 50%
 
     /* Regulator */
     uint256 private constant SUPPLY_CHANGE_DIVISOR = 12e18; // 12
     uint256 private constant SUPPLY_CHANGE_LIMIT = 10e16; // 10%
-    uint256 private constant ORACLE_POOL_RATIO = 40; // 40%
+    uint256 private constant ORACLE_POOL_RATIO = 60; // 60%
 
     /**
      * Getters
