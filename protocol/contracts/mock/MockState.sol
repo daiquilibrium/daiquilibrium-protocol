@@ -103,6 +103,10 @@ contract MockState is Setters {
         _state.epoch.currentPeriod = period;
     }
 
+    function setBootstrappingPeriodE(uint256 period) external {
+        _state.epoch.bootstrapping = period;
+    }
+
     function incrementEpochE() external {
         super.incrementEpoch();
     }

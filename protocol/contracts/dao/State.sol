@@ -39,11 +39,20 @@ contract Account {
     }
 }
 
+contract Bootstrapping {
+    struct State {
+        uint256 contributions;
+    }
+}
+
 contract Epoch {
     struct Global {
         uint256 current;
         uint256 currentStart;
         uint256 currentPeriod;
+        uint256 bootstrapping;
+        uint256 daiAdvanceIncentive;
+        bool shouldDistributeDAI;
     }
 
     struct Coupons {
@@ -93,6 +102,7 @@ contract Storage {
 
     struct State {
         Epoch.Global epoch;
+        Bootstrapping.State bootstrapping;
         Balance balance;
         Provider provider;
 

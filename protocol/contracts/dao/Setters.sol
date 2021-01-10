@@ -131,6 +131,18 @@ contract Setters is State, Getters {
      * Epoch
      */
 
+    function setDAIAdvanceIncentive(uint256 value) internal {
+        _state.epoch.daiAdvanceIncentive = value;
+    }
+
+    function shouldDistributeDAI(bool should) internal {
+        _state.epoch.shouldDistributeDAI = should;
+    }
+
+    function setBootstrappingPeriod(uint256 epochs) internal {
+        _state.epoch.bootstrapping = epochs;
+    }
+
     function initializeEpochs() internal {
         _state.epoch.currentStart = block.timestamp;
         _state.epoch.currentPeriod = Constants.getEpochStrategy().offset;
@@ -172,6 +184,14 @@ contract Setters is State, Getters {
         }
         _state.balance.coupons = _state.balance.coupons.sub(outstandingCouponsForEpoch);
         _state.epochs[epoch].coupons.outstanding = 0;
+    }
+
+    /**
+    * FixedSwap
+    */
+
+    function incrementContributions(uint256 amount) internal {
+        _state.bootstrapping.contributions = _state.bootstrapping.contributions.add(amount);
     }
 
     /**

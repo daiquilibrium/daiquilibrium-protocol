@@ -24,8 +24,8 @@ library Constants {
     uint256 private constant CHAIN_ID = 1; // Mainnet
 
     /* Bootstrapping */
-    uint256 private constant BOOTSTRAPPING_PERIOD = 150; // 150 epochs
-    uint256 private constant BOOTSTRAPPING_PRICE = 154e16; // 1.54 USDC (targeting 4.5% inflation)
+    uint256 private constant TARGET_SUPPLY = 25e24; // 25M DAIQ
+    uint256 private constant BOOTSTRAPPING_PRICE = 154e16; // 1.54 DAI (targeting 4.5% inflation)
 
     /* Oracle */
     address private constant DAI = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
@@ -52,8 +52,8 @@ library Constants {
     uint256 private constant GOVERNANCE_EMERGENCY_DELAY = 6; // 6 epochs
 
     /* DAO */
-    uint256 private constant ADVANCE_INCENTIVE = 50e18; // 50 DSD
-    uint256 private constant DAO_EXIT_LOCKUP_EPOCHS = 36; // 36 epochs fluid
+    uint256 private constant DAI_ADVANCE_INCENTIVE_CAP = 150e18; //150 DAI
+    uint256 private constant ADVANCE_INCENTIVE = 100e18; // 100 DAIQ
 
     /* Pool */
     uint256 private constant POOL_EXIT_LOCKUP_EPOCHS = 12; // 12 epochs fluid
@@ -91,8 +91,8 @@ library Constants {
         return INITIAL_STAKE_MULTIPLE;
     }
 
-    function getBootstrappingPeriod() internal pure returns (uint256) {
-        return BOOTSTRAPPING_PERIOD;
+    function getBootstrappingTarget() internal pure returns (Decimal.D256 memory) {
+        return Decimal.from(TARGET_SUPPLY);
     }
 
     function getBootstrappingPrice() internal pure returns (Decimal.D256 memory) {
@@ -119,6 +119,10 @@ library Constants {
         return ADVANCE_INCENTIVE;
     }
 
+    function getDaiAdvanceIncentiveCap() internal pure returns (uint256) {
+        return DAI_ADVANCE_INCENTIVE_CAP;
+    }
+
     function getDAOExitLockupEpochs() internal pure returns (uint256) {
         return DAO_EXIT_LOCKUP_EPOCHS;
     }
@@ -137,8 +141,6 @@ library Constants {
     
     function getInitialCouponRedemptionPenalty() internal pure returns (Decimal.D256 memory) {
         return Decimal.D256({value: INITIAL_COUPON_REDEMPTION_PENALTY});
-    }
-
     }
 
     function getSupplyChangeLimit() internal pure returns (Decimal.D256 memory) {

@@ -1,5 +1,5 @@
 /*
-    Copyright 2020 Dynamic Dollar Devs, based on the works of the Empty Set Squad
+    Copyright 2020 Daiquilibrium devs, based on the works of the Dynamic Dollar Devs and the Empty Set Squad
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -17,16 +17,24 @@
 pragma solidity ^0.5.17;
 pragma experimental ABIEncoderV2;
 
-import "../oracle/IUSDC.sol";
+import "./MockState.sol";
+import "../dao/Bootstrapper.sol";
+import "./MockComptroller.sol";
 
-contract MockUSDC is IUSDC {
-    bool private _blacklisted;
+contract MockBootstrapper is MockComptroller, Bootstrapper {
+    address private daiAddr;
+    
+    constructor() MockComptroller(address(0)) public { }
 
-    function isBlacklisted(address _account) external view returns (bool) {
-        return _blacklisted;
+    function stepE() external {
+        Bootstrapper.step();
     }
 
-    function setIsBlacklisted(bool blacklisted) external {
-        _blacklisted = blacklisted;
+    function setDAI(address dai) external {
+        daiAddr = dai;
+    }
+
+    function dai() public view returns (IERC20) {
+        return IERC20(daiAddr);
     }
 }

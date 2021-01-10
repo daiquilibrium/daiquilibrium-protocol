@@ -187,8 +187,28 @@ contract Getters is State {
         return _state.epochs[epoch].bonded;
     }
 
+    function bootstrappingPeriod() public view returns (uint256) {
+        return _state.epoch.bootstrapping;
+    }
+
     function bootstrappingAt(uint256 epoch) public view returns (bool) {
-        return epoch <= Constants.getBootstrappingPeriod();
+        return epoch <= bootstrappingPeriod();
+    }
+
+    function daiAdvanceIncentive() public view returns (uint256) {
+        return _state.epoch.daiAdvanceIncentive;
+    }
+
+    function shouldDistributeDAI() public view returns (bool) {
+        return _state.epoch.shouldDistributeDAI;
+    }
+
+    /**
+    * FixedSwap
+    */
+
+    function totalContributions() public view returns (uint256) {
+        return _state.bootstrapping.contributions;
     }
 
     /**
