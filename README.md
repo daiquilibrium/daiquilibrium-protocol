@@ -1,33 +1,28 @@
-# Dynamic Set Dollar
+# Daiquilibrium
 
-- shorthand name: `dynamic dollar`
-- full name: `Dynamic Set Dollar`
-- symbol: `DSD`
+- full name: `Daiquilibrium`
+- symbol: `DAIQ`
 - decimals: `18`
 - icon:
 
-![DSD Logo](https://dsd.finance/logo.png)
+![DAIIQ Logo](https://daiq.io/logo.png)
 
 ## contracts
 ### mainnet
-- `0x6Bf977ED1A09214E6209F4EA5f525261f1A2690a` **DAO (DSDS)**
-- `0xbd2f0cd039e0bfcf88901c98c0bfac5ab27566e3` **DSD**
-- `0xe2e279d1b911bad880d1104a750dfcd262fb6cf4` **Oracle**
-- `0x66e33d2605c5fb25ebb7cd7528e7997b0afa55e8` **UniswapV2 USDC:DSD Pair**
-- `0x70A87e1b97436D2F194B8B9EBF337bFc7521C70f` **LP Incentivation Pool**
-
-## audit of forked codebase
-
-is available [here](https://github.com/dynamicdollardevs/dsd/blob/master/audit/REP-Dollar-06-11-20.pdf).
+- `0x0aF9087FE3e8e834F3339FE4bEE87705e84Fd488` **DAO (DAIQS)**
+- `0x73D9E335669462Cbdd6aa3AdaFe9efeE86a37Fe9` **DAIQ**
+- `0x362f5F2C5855Ff09e542e89b8Ab7f7d0928C62da` **Oracle**
+- `0x26B4B107dCe673C00D59D71152136327cF6dFEBf` **UniswapV2 DAI:DAIQ Pair**
+- `0x7D9A429e8EBecD2726BD2bc0B843864ba075F0b4` **LP Incentivation Pool**
 
 ## disclaimer
 this project is an experiment - the protocol is audited, and we've put a significant amount of work into testing as well as generally de-risking the design of its core mechanism, however participants should take great caution as bugs resulting in loss of funds are always a possibility.
 
 ```
-Copyright 2020 Dynamic Dollar Devs, based on the works of the Empty Set Squad
+Copyright 2020 Daiquilibrium devs, based on the works of the Dynamic Dollar Devs and the Empty Set Squad
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use the included code except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
 http://www.apache.org/licenses/LICENSE-2.0
