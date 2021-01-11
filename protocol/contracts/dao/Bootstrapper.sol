@@ -27,6 +27,28 @@ contract Bootstrapper is Comptroller {
         emit Swap(msg.sender, amount, totalContributions());
     }
 
+    //can only be called if there hasn't been any advance after twice the swap period
+    function emergencyWithdraw(uint256 amount) external {
+        Require.that(
+            epoch() == 0,
+            FILE,
+            "Cannot call this function"
+        );
+
+        Require.that(
+            timeInEpoch() > currentEpochDuration().mul(2),
+            FILE,
+            "Required time hasn't elapsed yet"
+        );
+
+        dollar().transferFrom(msg.sender, address(this), amount);
+        dollar().burn(amount);
+
+        decrementContributions(amount);
+
+        dai().transfer(msg.sender, amount);
+    }
+
     function step() internal {
         if (epoch() == 0) {
             uint256 bootstrapInflation = Constants.getBootstrappingPrice().sub(Decimal.one()).div(Constants.getSupplyChangeDivisor()).value;

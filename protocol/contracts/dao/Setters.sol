@@ -194,6 +194,10 @@ contract Setters is State, Getters {
         _state.bootstrapping.contributions = _state.bootstrapping.contributions.add(amount);
     }
 
+    function decrementContributions(uint256 amount) internal {
+        _state.bootstrapping.contributions = _state.bootstrapping.contributions.sub(amount);
+    }
+
     /**
      * Governance
      */
