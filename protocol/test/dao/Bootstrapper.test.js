@@ -1,6 +1,6 @@
 const { accounts, contract } = require('@openzeppelin/test-environment');
 
-const { BN, expectRevert } = require('@openzeppelin/test-helpers');
+const { BN, expectRevert, time } = require('@openzeppelin/test-helpers');
 const expectEvent = require('@openzeppelin/test-helpers/src/expectEvent');
 const { expect } = require('chai');
 
@@ -64,6 +64,53 @@ describe("Bootstrapper", function () {
         });
 
     });
+
+    describe("emergency withdrawal", function () {
+
+        beforeEach(async function () {
+            await this.bootstrapper.setEpochParamsE(await time.latest(), 86000);
+            await this.dai.mint(userAddress, 1000);
+            await this.dai.approve(this.bootstrapper.address, 1000, { from: userAddress });
+            await this.dollar.approve(this.bootstrapper.address, 1000, { from: userAddress });
+
+            await this.bootstrapper.swap(1000, { from: userAddress });
+        });
+
+        describe("before required wait", function () {
+
+            it("reverts", async function () {
+                await expectRevert(this.bootstrapper.emergencyWithdraw(1000, { from: userAddress }), "Bootstrapper: Required time hasn't elapsed yet");
+            });
+        });
+
+        describe("after required wait", function () {
+
+            beforeEach(async function () {
+                await time.increase(86000 * 2 + 1);
+                await this.bootstrapper.emergencyWithdraw(1000, { from: userAddress });
+            });
+
+            it("completes", async function () {
+                expect(await this.dai.balanceOf(userAddress)).bignumber.equal(new BN(1000));
+                expect(await this.dollar.balanceOf(userAddress)).bignumber.zero;
+                expect(await this.dollar.balanceOf(this.bootstrapper.address)).bignumber.zero;
+            });
+
+        });
+
+        describe("after epoch 0", function () {
+
+            beforeEach(async function () {
+                await this.bootstrapper.incrementEpochE();
+            });
+
+            it("reverts", async function () {
+                await expectRevert(this.bootstrapper.emergencyWithdraw(1000, { from: userAddress }), "Bootstrapper: Cannot call this function");
+            });
+
+        });
+
+    })
 
     describe("step", function () {
 
