@@ -124,7 +124,7 @@ contract Govern is Setters, Permission, Upgradeable {
         );
 
         Require.that(
-            epochTime() > epoch().add(Constants.getGovernanceEmergencyDelay()),
+            block.timestamp > currentEpochStart().add(currentEpochDuration().mul(Constants.getGovernanceEmergencyDelay())),
             FILE,
             "Epoch synced"
         );
@@ -152,6 +152,6 @@ contract Govern is Setters, Permission, Upgradeable {
         }
 
         Decimal.D256 memory stake = Decimal.ratio(balanceOf(account), totalSupply());
-        return stake.greaterThan(Decimal.ratio(1, 100)); // 1%
+        return stake.greaterThan(Decimal.ratio(5, 1000)); // 1%
     }
 }

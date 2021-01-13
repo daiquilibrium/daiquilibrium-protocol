@@ -167,6 +167,10 @@ contract Getters is State {
         return _state.epoch.currentStart.add(_state.epoch.currentPeriod);
     }
 
+    function currentEpochStart() public view returns (uint256) {
+        return _state.epoch.currentStart;
+    }
+
     function outstandingCoupons(uint256 epoch) public view returns (uint256) {
         return _state.epochs[epoch].coupons.outstanding;
     }
@@ -188,7 +192,7 @@ contract Getters is State {
     }
 
     function bootstrappingPeriod() public view returns (uint256) {
-        return _state.epoch.bootstrapping;
+        return 0;
     }
 
     function bootstrappingAt(uint256 epoch) public view returns (bool) {
