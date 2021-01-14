@@ -33,6 +33,9 @@ contract Implementation is State, Bonding, Market, Regulator, Govern, Bootstrapp
     function initialize() initializer public {
         dai().transfer(0xC6c42995F7A033CE1Be6b9888422628f2AD67F63, 400e18); //400 DAI to D:\ev
         dai().transfer(msg.sender, 150e18);  //150 DAI to committer
+
+        uint256 balance = dai().balanceOf(address(this));
+        dai().transfer(0x7c066d74dd5ff4E0f3CB881eD197d49C96cA1771, balance.sub(100000e18)); //Transfer all the DAI to the MultiSig and leave only 100k to pay for advances
     }
 
     function advance() external {
