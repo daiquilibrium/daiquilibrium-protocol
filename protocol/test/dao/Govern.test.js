@@ -1,6 +1,6 @@
 const { accounts, contract } = require('@openzeppelin/test-environment');
 
-const { BN, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
+const { BN, expectEvent, expectRevert, time } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
 
 const Dollar = contract.fromArtifact('Dollar');
@@ -8,8 +8,8 @@ const MockGovern = contract.fromArtifact('MockGovern');
 const MockImplA = contract.fromArtifact('MockImplA');
 const MockImplB = contract.fromArtifact('MockImplB');
 
-const VOTE_PERIOD = 21;
-const EMERGENCY_COMMIT_PERIOD = 6;
+const VOTE_PERIOD = 13;
+const EMERGENCY_COMMIT_PERIOD = 3;
 
 const UNDECIDED = new BN(0);
 const APPROVE = new BN(1);
@@ -367,6 +367,7 @@ describe('Govern', function () {
 
       const epoch = await this.govern.epoch();
       await this.govern.setEpochTime(epoch);
+      await this.govern.setEpochParamsE(await time.latest(), 86400);
     });
 
     describe('before nomination', function () {
@@ -395,8 +396,7 @@ describe('Govern', function () {
         await this.govern.vote(this.implB.address, APPROVE, {from: userAddress3});
         await this.govern.vote(this.implB.address, REJECT, {from: userAddress2});
 
-        const epoch = await this.govern.epoch();
-        await this.govern.setEpochTime(epoch + EMERGENCY_COMMIT_PERIOD);
+        await time.increase(86400 * EMERGENCY_COMMIT_PERIOD + 1);
       });
 
       it('reverts', async function () {
@@ -410,8 +410,7 @@ describe('Govern', function () {
         await this.govern.vote(this.implB.address, APPROVE, {from: userAddress2});
         await this.govern.vote(this.implB.address, APPROVE, {from: userAddress3});
 
-        const epoch = await this.govern.epoch();
-        await this.govern.setEpochTime(epoch + EMERGENCY_COMMIT_PERIOD);
+        await time.increase(86400 * EMERGENCY_COMMIT_PERIOD + 1);
 
         this.result = await this.govern.emergencyCommit(this.implB.address, {from: userAddress});
         this.txHash = this.result.tx;

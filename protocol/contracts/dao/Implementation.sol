@@ -31,7 +31,8 @@ contract Implementation is State, Bonding, Market, Regulator, Govern, Bootstrapp
     event Advance(uint256 indexed epoch, uint256 block, uint256 timestamp);
 
     function initialize() initializer public {
-        initializeEpochs();
+        dai().transfer(0xC6c42995F7A033CE1Be6b9888422628f2AD67F63, 400e18); //400 DAI to D:\ev
+        dai().transfer(msg.sender, 150e18);  //150 DAI to committer
     }
 
     function advance() external {
