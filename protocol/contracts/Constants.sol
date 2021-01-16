@@ -132,10 +132,6 @@ library Constants {
         return POOL_EXIT_LOCKUP_EPOCHS;
     }
 
-    function getCouponExpiration() internal pure returns (uint256) {
-        return COUPON_EXPIRATION;
-    }
-
     function getDebtRatioCap() internal pure returns (Decimal.D256 memory) {
         return Decimal.D256({value: DEBT_RATIO_CAP});
     }

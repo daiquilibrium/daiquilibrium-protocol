@@ -28,12 +28,21 @@ contract Curve {
     function calculateCouponPremium(
         uint256 totalSupply,
         uint256 totalDebt,
-        uint256 amount
+        uint256 amount,
+        uint256 expirationPeriod
     ) internal pure returns (uint256) {
-        return effectivePremium(totalSupply, totalDebt, amount).mul(amount).asUint256();
+        return basePremium(totalSupply, totalDebt, amount).add(additionalPremium(expirationPeriod)).mul(amount).asUint256();
     }
 
-    function effectivePremium(
+    function calculateBasePremium(uint256 totalSupply, uint256 totalDebt, uint256 amount) internal pure returns (uint256) {
+        return basePremium(totalSupply, totalDebt, amount).mul(amount).asUint256();
+    }
+
+    function calculateAdditionalPremium(uint256 amount, uint256 expirationPeriod) internal pure returns (uint256) {
+        return additionalPremium(expirationPeriod).mul(amount).asUint256();
+    }
+
+    function basePremium(
         uint256 totalSupply,
         uint256 totalDebt,
         uint256 amount
@@ -61,14 +70,21 @@ contract Curve {
         return curveMean(debtRatioEnd, debtRatio);
     }
 
-    // 1/(3(1-R)^2)-1/3
-    function curve(Decimal.D256 memory debtRatio) private pure returns (Decimal.D256 memory) {
-        return Decimal.one().div(
-            Decimal.from(3).mul((Decimal.one().sub(debtRatio)).pow(2))
-        ).sub(Decimal.ratio(1, 3));
+    // 0.3 / (1 + P * 0.05)
+    function additionalPremium(uint256 expirationPeriod) private pure returns (Decimal.D256 memory) {
+        return Decimal.D256({ value: 30e16 }).div(
+            Decimal.one().add(Decimal.D256({ value: 5e16 }).mul(expirationPeriod.sub(1)))
+        );
     }
 
-    // 1/(3(1-R)(1-R'))-1/3
+    // 1/(6(1-R)^2)-1/6
+    function curve(Decimal.D256 memory debtRatio) private pure returns (Decimal.D256 memory) {
+        return Decimal.one().div(
+            Decimal.from(6).mul((Decimal.one().sub(debtRatio)).pow(2))
+        ).sub(Decimal.ratio(1, 6));
+    }
+
+    // 1/(6(1-R)(1-R'))-1/6
     function curveMean(
         Decimal.D256 memory lower,
         Decimal.D256 memory upper
@@ -78,7 +94,7 @@ contract Curve {
         }
 
         return Decimal.one().div(
-            Decimal.from(3).mul(Decimal.one().sub(upper)).mul(Decimal.one().sub(lower))
-        ).sub(Decimal.ratio(1, 3));
+            Decimal.from(6).mul(Decimal.one().sub(upper)).mul(Decimal.one().sub(lower))
+        ).sub(Decimal.ratio(1, 6));
     }
 }
