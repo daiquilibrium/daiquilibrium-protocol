@@ -74,8 +74,13 @@ contract MockState is Setters {
         super.decrementBalanceOfStaged(account, amount, reason);
     }
 
-    function incrementBalanceOfCouponsE(address account, uint256 epoch, uint256 amount) external {
-        super.incrementBalanceOfCoupons(account, epoch, amount);
+    function incrementBalanceOfCouponsE(address account, uint256 epoch, uint256 amount, uint256 expiration) external {
+        super.incrementBalanceOfCoupons(account, epoch, amount, expiration);
+    }
+
+    function incrementUserCoupons(address account, uint256 epoch, uint256 coupons) external {
+        _state.accounts[account].coupons[epoch] = _state.accounts[account].coupons[epoch].add(coupons);
+        _state.balance.coupons = _state.balance.coupons.add(coupons);
     }
 
     function decrementBalanceOfCouponsE(address account, uint256 epoch, uint256 amount, string calldata reason) external {
@@ -113,14 +118,6 @@ contract MockState is Setters {
 
     function snapshotTotalBondedE() external {
         super.snapshotTotalBonded();
-    }
-
-    function initializeCouponsExpirationE(uint256 epoch, uint256 expiration) external {
-        super.initializeCouponsExpiration(epoch, expiration);
-    }
-
-    function eliminateOutstandingCouponsE(uint256 epoch) external {
-       super.eliminateOutstandingCoupons(epoch);
     }
 
     /**

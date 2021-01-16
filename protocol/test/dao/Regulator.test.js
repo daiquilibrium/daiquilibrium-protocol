@@ -132,7 +132,7 @@ describe('Regulator', function () {
           await this.regulator.mintToE(this.regulator.address, 1000000);
 
           await this.regulator.increaseDebtE(new BN(2000));
-          await this.regulator.incrementBalanceOfCouponsE(userAddress, 1, new BN(100000));
+          await this.regulator.incrementBalanceOfCouponsE(userAddress, 1, new BN(100000), 100000);
 
           await this.regulator.incrementEpochE(); // 2
         });
@@ -210,7 +210,7 @@ describe('Regulator', function () {
           await this.regulator.mintToE(this.regulator.address, 1000000);
 
           await this.regulator.increaseDebtE(new BN(2000));
-          await this.regulator.incrementBalanceOfCouponsE(userAddress, 1, new BN(100000));
+          await this.regulator.incrementBalanceOfCouponsE(userAddress, 1, new BN(100000), 100000);
 
           await this.regulator.incrementEpochE(); // 2
         });
