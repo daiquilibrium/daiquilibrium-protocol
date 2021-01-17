@@ -310,16 +310,12 @@ describe('Stated', function () {
 
     describe('when called', function () {
       beforeEach('call', async function () {
-        await this.setters.incrementBalanceOfCouponsE(userAddress, epoch, 100);
-        await this.setters.incrementBalanceOfCouponsE(userAddress, epoch, 100);
+        await this.setters.incrementBalanceOfCouponsE(userAddress, epoch, 100, 100000);
+        await this.setters.incrementBalanceOfCouponsE(userAddress, epoch, 100, 100000);
       });
 
       it('increments balance of coupons for user during epoch', async function () {
         expect(await this.setters.balanceOfCoupons(userAddress, epoch)).to.be.bignumber.equal(new BN(200));
-      });
-
-      it('increments outstanding coupons for epoch', async function () {
-        expect(await this.setters.outstandingCoupons(epoch)).to.be.bignumber.equal(new BN(200));
       });
 
       it('increments total outstanding coupons', async function () {
@@ -333,17 +329,13 @@ describe('Stated', function () {
 
     describe('when called', function () {
       beforeEach('call', async function () {
-        await this.setters.incrementBalanceOfCouponsE(userAddress, epoch, 500);
+        await this.setters.incrementBalanceOfCouponsE(userAddress, epoch, 500, 100000);
         await this.setters.decrementBalanceOfCouponsE(userAddress, epoch, 100, "decrementBalanceOfCouponsE - 1");
         await this.setters.decrementBalanceOfCouponsE(userAddress, epoch, 100, "decrementBalanceOfCouponsE - 2");
       });
 
       it('decrements balance of coupons for user during epoch', async function () {
         expect(await this.setters.balanceOfCoupons(userAddress, epoch)).to.be.bignumber.equal(new BN(300));
-      });
-
-      it('decrements outstanding coupons for epoch', async function () {
-        expect(await this.setters.outstandingCoupons(epoch)).to.be.bignumber.equal(new BN(300));
       });
 
       it('decrements total outstanding coupons', async function () {
@@ -353,7 +345,7 @@ describe('Stated', function () {
 
     describe('when called erroneously', function () {
       beforeEach('call', async function () {
-        await this.setters.incrementBalanceOfCouponsE(userAddress, epoch, 100);
+        await this.setters.incrementBalanceOfCouponsE(userAddress, epoch, 100, 100000);
       });
 
       it('reverts', async function () {
@@ -606,37 +598,6 @@ describe('Stated', function () {
     });
   });
 
-  describe('initializeCouponsExpiration', function () {
-    describe('when called', function () {
-      beforeEach('call', async function () {
-        await this.setters.initializeCouponsExpirationE(2, 91);
-      });
-
-      it('has expiration set', async function () {
-        expect(await this.setters.couponsExpiration(2)).to.be.bignumber.equal(new BN(91));
-        expect(await this.setters.expiringCoupons(91)).to.be.bignumber.equal(new BN(1));
-        expect(await this.setters.expiringCouponsAtIndex(91, 0)).to.be.bignumber.equal(new BN(2));
-      });
-    });
-  });
-
-  describe('eliminateOutstandingCoupons', function () {
-    beforeEach('call', async function () {
-      await this.setters.incrementBalanceOfCouponsE(userAddress, 1, 100);
-    });
-
-    describe('when called', function () {
-      beforeEach('call', async function () {
-        await this.setters.eliminateOutstandingCouponsE(1);
-      });
-
-      it('has expiration set', async function () {
-        expect(await this.setters.totalCoupons()).to.be.bignumber.equal(new BN(0));
-        expect(await this.setters.outstandingCoupons(1)).to.be.bignumber.equal(new BN(0));
-        expect(await this.setters.balanceOfCoupons(userAddress, 1)).to.be.bignumber.equal(new BN(0));
-      });
-    });
-  });
 
   describe('bootstrappingAt', function () {
 

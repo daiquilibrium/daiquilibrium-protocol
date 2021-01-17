@@ -102,15 +102,17 @@ contract Setters is State, Getters {
         _state.balance.staged = _state.balance.staged.sub(amount, reason);
     }
 
-    function incrementBalanceOfCoupons(address account, uint256 epoch, uint256 amount) internal {
-        _state.accounts[account].coupons[epoch] = _state.accounts[account].coupons[epoch].add(amount);
-        _state.epochs[epoch].coupons.outstanding = _state.epochs[epoch].coupons.outstanding.add(amount);
-        _state.balance.coupons = _state.balance.coupons.add(amount);
+    function incrementBalanceOfCoupons(address account, uint256 epoch, uint256 amount, uint256 expiration) internal {
+        _state.accounts[account].coupons[epoch] = _state.accounts[account].coupons[epoch].add(amount); //Adds coupons to user's balance
+        _state.balance.coupons = _state.balance.coupons.add(amount); //increments total outstanding coupons
+        _state3.couponExpirationsByAccount[account][epoch] = expiration; //sets the expiration epoch for the user's coupons
+        _state3.expiringCouponsByEpoch[expiration] = _state3.expiringCouponsByEpoch[expiration].add(amount); //Increments the number of expiring coupons in epoch
     }
 
     function decrementBalanceOfCoupons(address account, uint256 epoch, uint256 amount, string memory reason) internal {
         _state.accounts[account].coupons[epoch] = _state.accounts[account].coupons[epoch].sub(amount, reason);
-        _state.epochs[epoch].coupons.outstanding = _state.epochs[epoch].coupons.outstanding.sub(amount, reason);
+        uint256 expiration = _state3.couponExpirationsByAccount[account][epoch];
+        _state3.expiringCouponsByEpoch[expiration] = _state3.expiringCouponsByEpoch[expiration].sub(amount, reason);
         _state.balance.coupons = _state.balance.coupons.sub(amount, reason);
     }
 
@@ -172,18 +174,9 @@ contract Setters is State, Getters {
         _state.epochs[epoch()].bonded = totalSupply();
     }
 
-    function initializeCouponsExpiration(uint256 epoch, uint256 expiration) internal {
-        _state.epochs[epoch].coupons.expiration = expiration;
-        _state.epochs[expiration].coupons.expiring.push(epoch);
-    }
-
-    function eliminateOutstandingCoupons(uint256 epoch) internal {
-        uint256 outstandingCouponsForEpoch = outstandingCoupons(epoch);
-        if(outstandingCouponsForEpoch == 0) {
-            return;
-        }
-        _state.balance.coupons = _state.balance.coupons.sub(outstandingCouponsForEpoch);
-        _state.epochs[epoch].coupons.outstanding = 0;
+    function expireCoupons(uint256 epoch) internal {
+        _state.balance.coupons = _state.balance.coupons.sub( _state3.expiringCouponsByEpoch[epoch]);
+        _state3.expiringCouponsByEpoch[epoch] = 0;
     }
 
     /**

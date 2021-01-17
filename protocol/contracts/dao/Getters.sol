@@ -115,11 +115,18 @@ contract Getters is State {
         return totalBonded().mul(balanceOf(account)).div(totalSupply);
     }
 
-    function balanceOfCoupons(address account, uint256 epoch) public view returns (uint256) {
-        if (outstandingCoupons(epoch) == 0) {
+    function balanceOfCoupons(address account, uint256 _epoch) public view returns (uint256) {
+        uint256 expiration = couponExpirationForAccount(account, _epoch);
+        
+        if (expiration > 0 && epoch() >= expiration) {
             return 0;
         }
-        return _state.accounts[account].coupons[epoch];
+
+        return _state.accounts[account].coupons[_epoch];
+    }
+
+    function couponExpirationForAccount(address account, uint256 epoch) public view returns (uint256) {
+        return _state3.couponExpirationsByAccount[account][epoch];
     }
 
     function statusOf(address account) public view returns (Account.Status) {
@@ -171,20 +178,8 @@ contract Getters is State {
         return _state.epoch.currentStart;
     }
 
-    function outstandingCoupons(uint256 epoch) public view returns (uint256) {
-        return _state.epochs[epoch].coupons.outstanding;
-    }
-
-    function couponsExpiration(uint256 epoch) public view returns (uint256) {
-        return _state.epochs[epoch].coupons.expiration;
-    }
-
     function expiringCoupons(uint256 epoch) public view returns (uint256) {
-        return _state.epochs[epoch].coupons.expiring.length;
-    }
-
-    function expiringCouponsAtIndex(uint256 epoch, uint256 i) public view returns (uint256) {
-        return _state.epochs[epoch].coupons.expiring[i];
+        return _state3.expiringCouponsByEpoch[epoch];
     }
 
     function totalBondedAt(uint256 epoch) public view returns (uint256) {

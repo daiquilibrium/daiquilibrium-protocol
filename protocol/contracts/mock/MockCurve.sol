@@ -25,8 +25,9 @@ contract MockCurve is Curve {
     function calculateCouponsE(
         uint256 totalSupply,
         uint256 totalDebt,
-        uint256 amount
+        uint256 amount,
+        uint256 expirationPeriod
     ) external pure returns (uint256) {
-        return super.calculateCouponPremium(totalSupply, totalDebt, amount);
+        return super.calculateCouponPremium(totalSupply, totalDebt, amount, expirationPeriod);
     }
 }

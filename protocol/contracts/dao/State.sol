@@ -33,7 +33,7 @@ contract Account {
         uint256 staged;
         uint256 balance;
         mapping(uint256 => uint256) coupons;
-        mapping(address => uint256) couponAllowances;
+        mapping(address => uint256) couponAllowances; //unused since DAIQIP-3
         uint256 fluidUntil;
         uint256 lockedUntil;
     }
@@ -56,14 +56,14 @@ contract Epoch {
     }
 
     struct Coupons {
-        uint256 outstanding;
-        uint256 expiration;
-        uint256[] expiring;
+        uint256 outstanding; //unused since DAIQIP-3
+        uint256 expiration; //unused since DAIQIP-3
+        uint256[] expiring; //unused since DAIQIP-3
     }
 
     struct State {
         uint256 bonded;
-        Coupons coupons;
+        Coupons coupons; //unused since DAIQIP-3
     }
 }
 
@@ -110,8 +110,16 @@ contract Storage {
         mapping(uint256 => Epoch.State) epochs;
         mapping(address => Candidate.State) candidates;
     }
+
+    struct State3 {
+        mapping(address => mapping(uint256 => uint256)) couponExpirationsByAccount;
+        mapping(uint256 => uint256) expiringCouponsByEpoch;
+    }
 }
 
 contract State {
     Storage.State _state;
+
+    //DAIQIP-3
+    Storage.State3 _state3;
 }
