@@ -76,6 +76,18 @@ library Constants {
         return DAI;
     }
 
+    function getPairAddress() internal pure returns (address) {
+        return address(0x26B4B107dCe673C00D59D71152136327cF6dFEBf);
+    }
+
+    function getMultisigAddress() internal pure returns (address) {
+        return address(0x7c066d74dd5ff4E0f3CB881eD197d49C96cA1771);
+    }
+
+    function getMarketingMultisigAddress() internal pure returns (address) {
+        return address(0x0BCbDfd1ab7c2cBb6a8612f3300f214a779cb520);
+    }
+
     function getOracleReserveMinimum() internal pure returns (uint256) {
         return ORACLE_RESERVE_MINIMUM;
     }

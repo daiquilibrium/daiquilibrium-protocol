@@ -7,7 +7,7 @@
     "scripts": {
         "build": "npm run compile",
         "compile": "truffle compile",
-        "test": "mocha --timeout 10000 --exit --recursive test",
+        "test": "mocha --timeout 60000 --exit --recursive test",
         "deploy": "truffle migrate --network mainnet",
         "verify": "truffle run verify Implementation --network mainnet"
     },
@@ -22,11 +22,14 @@
         "web3-provider-engine": "^16.0.1"
     },
     "devDependencies": {
+        "@nomiclabs/hardhat-ethers": "^2.0.1",
         "@openzeppelin/test-environment": "^0.1.9",
         "@openzeppelin/test-helpers": "^0.5.10",
         "chai": "^4.2.0",
         "dotenv": "^8.2.0",
         "eth-sig-util": "^2.5.3",
+        "ethers": "^5.0.26",
+        "hardhat": "^2.0.8",
         "husky": "^4.2.5",
         "mocha": "^7.0.0",
         "truffle-plugin-verify": "^0.4.0",

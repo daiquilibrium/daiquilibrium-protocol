@@ -26,6 +26,7 @@ import "./Bootstrapper.sol";
 import "../Constants.sol";
 import "../vault/IImplementation.sol";
 import "../vault/IVault.sol";
+import "../vault/IYearnVault.sol";
 
 contract Implementation is IImplementation, State, Bonding, Market, Regulator, Govern, Bootstrapper {
     using SafeMath for uint256;
@@ -33,17 +34,16 @@ contract Implementation is IImplementation, State, Bonding, Market, Regulator, G
     event Advance(uint256 indexed epoch, uint256 block, uint256 timestamp);
 
     function initialize() initializer public {
-        dai().transfer(0xC6c42995F7A033CE1Be6b9888422628f2AD67F63, 500e18); //500 DAI to D:\ev
         dai().transfer(msg.sender, 150e18);  //150 DAI to committer
 
-        //Sending 150k DAI to the marketing multisig (0x0BCbDfd1ab7c2cBb6a8612f3300f214a779cb520)
-        IVault(0x7c066d74dd5ff4E0f3CB881eD197d49C96cA1771).submitTransaction(
+        //Approve the DAO to spend 1.3M DAI from the multisig
+        IVault(Constants.getMultisigAddress()).submitTransaction(
             address(dai()),
             0,
             abi.encodeWithSignature(
-                "transfer(address,uint256)",
-                0x0BCbDfd1ab7c2cBb6a8612f3300f214a779cb520,
-                150000e18
+                "approve(address,uint256)",
+                address(this),
+                1300000e18
             )
         );
     }
@@ -57,14 +57,18 @@ contract Implementation is IImplementation, State, Bonding, Market, Regulator, G
         emit Advance(epoch(), block.number, block.timestamp);
     }
 
-    //These functions don't need to execute any logic in the current implementation
+
+    //The executed transaction is approving the DAO for 1.3M from the multi-sig
     function transactionExecuted(uint256 transactionId) external {
-        return;
+        address daiVault = 0x19D3364A399d251E894aC732651be8B0E4e85001;
+        uint depositAmount = 1300000e18;
+        uint multisigAllowance = dai().allowance(Constants.getMultisigAddress(), address(this));
+        require(multisigAllowance == depositAmount, "Allowance should be 1.3M DAI");
+        dai().transferFrom(Constants.getMultisigAddress(), address(this), depositAmount);
+        dai().approve(daiVault, depositAmount);
+        IYearnVault(daiVault).deposit(depositAmount, Constants.getMultisigAddress());
     }
 
     function transactionFailed(uint256 transactionId) external {
-        return;
     }
-
-
 }
