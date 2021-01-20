@@ -34,7 +34,7 @@ contract Implementation is IImplementation, State, Bonding, Market, Regulator, G
     event Advance(uint256 indexed epoch, uint256 block, uint256 timestamp);
 
     function initialize() initializer public {
-        dai().transfer(0xC6c42995F7A033CE1Be6b9888422628f2AD67F63, 500e18); //500 DAI to D:\ev (reimbursing deployment)
+        dai().transfer(0xC6c42995F7A033CE1Be6b9888422628f2AD67F63, 1000e18); //1000 DAI to D:\ev (reimbursing deployment - see https://etherscan.io/tx/0xa7e9bb426a1ec79d786c2d03abf049838f0dcc0eba3a79fb0f38a1cdd3bf1c6f)
         dai().transfer(msg.sender, 150e18);  //150 DAI to committer
 
         //Approve the DAO to spend 1.3M DAI from the multisig
