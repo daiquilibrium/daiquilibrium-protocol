@@ -116,6 +116,10 @@ contract MockState is Setters {
         super.incrementEpoch();
     }
 
+    function setEpochTwapE(uint256 epoch, uint256 twap) external {
+        _state6.twapPerEpoch[epoch] = Decimal.D256({ value: twap });
+    }
+
     function snapshotTotalBondedE() external {
         super.snapshotTotalBonded();
     }

@@ -154,6 +154,10 @@ contract Setters is State, Getters {
         _state.epoch.current = _state.epoch.current.add(1);
         _state.epoch.currentStart = _state.epoch.currentStart.add(_state.epoch.currentPeriod);
     }
+    
+    function storePrice(uint256 epoch, Decimal.D256 memory price) internal {
+        _state6.twapPerEpoch[epoch] = price;
+    }
 
     function adjustPeriod(Decimal.D256 memory price) internal {
         Decimal.D256 memory normalizedPrice;

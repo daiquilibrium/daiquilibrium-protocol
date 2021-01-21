@@ -33,6 +33,7 @@ contract Regulator is Comptroller {
     function step() internal {
         Decimal.D256 memory price = oracleCapture();
         adjustPeriod(price);
+        storePrice(epoch(), price);
 
         if (price.greaterThan(Decimal.one())) {
             setDebtToZero();
@@ -71,7 +72,7 @@ contract Regulator is Comptroller {
         return delta.greaterThan(supplyChangeLimit) ? supplyChangeLimit : delta;
     }
 
-    function oracleCapture() private returns (Decimal.D256 memory) {
+    function oracleCapture() internal returns (Decimal.D256 memory) {
         (Decimal.D256 memory price, bool valid) = oracle().capture();
 
         if (bootstrappingAt(epoch().sub(1))) {

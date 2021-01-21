@@ -115,6 +115,11 @@ contract Storage {
         mapping(address => mapping(uint256 => uint256)) couponExpirationsByAccount;
         mapping(uint256 => uint256) expiringCouponsByEpoch;
     }
+
+    struct State6 {
+        //storing twap for every epoch, in case we want to do something fancy in the future (e.g. calculating volatility)
+        mapping(uint256 => Decimal.D256) twapPerEpoch;
+    }
 }
 
 contract State {
@@ -122,4 +127,7 @@ contract State {
 
     //DAIQIP-3
     Storage.State3 _state3;
+    
+    //DAIQIP-6
+    Storage.State6 _state6;
 }

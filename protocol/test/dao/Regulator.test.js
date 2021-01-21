@@ -198,6 +198,10 @@ describe('Regulator', function () {
           expect(await this.regulator.currentEpochDuration()).bignumber.equal(this.expectedEpochLength);
         });
 
+        it ('records epoch price', async function () {
+            expect(await this.regulator.twapAtEpoch(7)).bignumber.equal(1.5e18.toString());
+        });
+
       });
 
     });
