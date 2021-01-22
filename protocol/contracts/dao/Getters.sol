@@ -174,6 +174,10 @@ contract Getters is State {
         return _state.epoch.currentStart.add(_state.epoch.currentPeriod);
     }
 
+    function twapAtEpoch(uint256 epoch) public view returns (uint256) {
+        return _state6.twapPerEpoch[epoch].value;
+    }
+
     function currentEpochStart() public view returns (uint256) {
         return _state.epoch.currentStart;
     }

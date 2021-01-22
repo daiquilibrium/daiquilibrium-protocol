@@ -54,17 +54,9 @@ contract Market is Comptroller, Curve {
 
         emit CouponExpiration(epoch, expiredAmount, lessRedeemable, lessDebt, newBonded);
     }
-
-    function baseCouponPremium(uint256 amount) public view returns (uint256) {
-        return calculateBasePremium(dollar().totalSupply(), totalDebt(), amount);
-    }
-
-    function additionalCouponPremium(uint256 amount, uint256 expirationPeriod) public pure returns (uint256) {
-        return calculateAdditionalPremium(amount, expirationPeriod > 2 ? expirationPeriod - 2 : 1);
-    }
-
+    
     function couponPremium(uint256 amount, uint256 expirationPeriod) public view returns (uint256) {
-        return calculateCouponPremium(dollar().totalSupply(), totalDebt(), amount, expirationPeriod > 2 ? expirationPeriod - 2 : 1);
+        return calculateCouponPremium(dollar().totalSupply(), totalDebt(), amount, _state6.twapPerEpoch[epoch()], expirationPeriod > 2 ? expirationPeriod - 2 : 1);
     }
 
     function couponRedemptionPenalty(uint256 couponEpoch, uint256 couponAmount, uint256 expirationPeriod) public view returns (uint256) {

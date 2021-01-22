@@ -29,72 +29,64 @@ contract Curve {
         uint256 totalSupply,
         uint256 totalDebt,
         uint256 amount,
+        Decimal.D256 memory price,
         uint256 expirationPeriod
     ) internal pure returns (uint256) {
-        return basePremium(totalSupply, totalDebt, amount).add(additionalPremium(expirationPeriod)).mul(amount).asUint256();
+        return couponPremium(totalSupply, totalDebt, price, expirationPeriod).mul(amount).asUint256();
     }
 
-    function calculateBasePremium(uint256 totalSupply, uint256 totalDebt, uint256 amount) internal pure returns (uint256) {
-        return basePremium(totalSupply, totalDebt, amount).mul(amount).asUint256();
-    }
-
-    function calculateAdditionalPremium(uint256 amount, uint256 expirationPeriod) internal pure returns (uint256) {
-        return additionalPremium(expirationPeriod).mul(amount).asUint256();
-    }
-
-    function basePremium(
+    function couponPremium(
         uint256 totalSupply,
         uint256 totalDebt,
-        uint256 amount
+        Decimal.D256 memory price,
+        uint256 expirationPeriod
     ) private pure returns (Decimal.D256 memory) {
-        Decimal.D256 memory debtRatio = Decimal.ratio(totalDebt, totalSupply);
         Decimal.D256 memory debtRatioUpperBound = Constants.getDebtRatioCap();
 
-        uint256 totalSupplyEnd = totalSupply.sub(amount);
-        uint256 totalDebtEnd = totalDebt.sub(amount);
-        Decimal.D256 memory debtRatioEnd = Decimal.ratio(totalDebtEnd, totalSupplyEnd);
+        Decimal.D256 memory debtRatio = Decimal.ratio(totalDebt, totalSupply);
 
-        if (debtRatio.greaterThan(debtRatioUpperBound)) {
-            if (debtRatioEnd.greaterThan(debtRatioUpperBound)) {
-                return curve(debtRatioUpperBound);
-            }
+        debtRatio = debtRatio.greaterThan(debtRatioUpperBound)
+            ? debtRatioUpperBound
+            : debtRatio;
 
-            Decimal.D256 memory premiumCurve = curveMean(debtRatioEnd, debtRatioUpperBound);
-            Decimal.D256 memory premiumCurveDelta = debtRatioUpperBound.sub(debtRatioEnd);
-            Decimal.D256 memory premiumFlat = curve(debtRatioUpperBound);
-            Decimal.D256 memory premiumFlatDelta = debtRatio.sub(debtRatioUpperBound);
-            return (premiumCurve.mul(premiumCurveDelta)).add(premiumFlat.mul(premiumFlatDelta))
-                .div(premiumCurveDelta.add(premiumFlatDelta));
-        }
+        if (expirationPeriod > 1000)
+            return lowRiskPremium(debtRatio, price, expirationPeriod);
+        
+        if (expirationPeriod > 100)
+            return mediumRiskPremium(debtRatio, price, expirationPeriod);
 
-        return curveMean(debtRatioEnd, debtRatio);
+        return highRiskPremium(debtRatio, price, expirationPeriod);
     }
 
-    // 0.3 / (1 + P * 0.05)
-    function additionalPremium(uint256 expirationPeriod) private pure returns (Decimal.D256 memory) {
-        return Decimal.D256({ value: 30e16 }).div(
-            Decimal.one().add(Decimal.D256({ value: 5e16 }).mul(expirationPeriod.sub(1)))
+    //R * (1 - P) *  2.2 / (1 + (T - 1) * 0.0001)
+    function lowRiskPremium(Decimal.D256 memory debtRatio, Decimal.D256 memory price, uint256 expirationPeriod) private pure returns (Decimal.D256 memory) {
+        return multiplier(debtRatio, price).mul(
+            Decimal.D256({ value: 2.2e18 }).div(
+                Decimal.one().add(Decimal.D256({ value: 1e14 }).mul(expirationPeriod - 1))
+            )
         );
     }
 
-    // 1/(6(1-R)^2)-1/6
-    function curve(Decimal.D256 memory debtRatio) private pure returns (Decimal.D256 memory) {
-        return Decimal.one().div(
-            Decimal.from(6).mul((Decimal.one().sub(debtRatio)).pow(2))
-        ).sub(Decimal.ratio(1, 6));
+    //R * (1 - P) * 6 /(1 + (T - 1) * 0.002)
+    function mediumRiskPremium(Decimal.D256 memory debtRatio, Decimal.D256 memory price, uint256 expirationPeriod) private pure returns (Decimal.D256 memory) {
+        return multiplier(debtRatio, price).mul(
+            Decimal.D256({ value: 6e18 }).div(
+                Decimal.one().add(Decimal.D256({ value: 2e15 }).mul(expirationPeriod - 1))
+            )
+        );
     }
 
-    // 1/(6(1-R)(1-R'))-1/6
-    function curveMean(
-        Decimal.D256 memory lower,
-        Decimal.D256 memory upper
-    ) private pure returns (Decimal.D256 memory) {
-        if (lower.equals(upper)) {
-            return curve(lower);
-        }
+    //R * (1 - P) * 10 /(1 + (T - 1) * 0.01)
+    function highRiskPremium(Decimal.D256 memory debtRatio, Decimal.D256 memory price, uint256 expirationPeriod) private pure returns (Decimal.D256 memory) {
+        return multiplier(debtRatio, price).mul(
+            Decimal.D256({ value: 10e18 }).div(
+                Decimal.one().add(Decimal.D256({ value: 1e16 }).mul(expirationPeriod - 1))
+            )
+        );
+    }
 
-        return Decimal.one().div(
-            Decimal.from(6).mul(Decimal.one().sub(upper)).mul(Decimal.one().sub(lower))
-        ).sub(Decimal.ratio(1, 6));
+    //R * (1 - P)
+    function multiplier(Decimal.D256 memory debtRatio, Decimal.D256 memory price) private pure returns (Decimal.D256 memory) {
+        return debtRatio.mul(Decimal.one().sub(price));
     }
 }
