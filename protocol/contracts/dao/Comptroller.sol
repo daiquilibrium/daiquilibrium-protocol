@@ -70,8 +70,8 @@ contract Comptroller is Setters {
         balanceCheck();
     }
 
-    function increaseSupply(uint256 newSupply) internal returns (uint256, uint256, uint256) {
-        (uint256 newRedeemable, uint256 lessDebt, uint256 poolReward) = (0, 0, 0);
+    function increaseSupply(uint256 newSupply) internal returns (uint256, uint256, uint256, uint256) {
+        (uint256 newRedeemable, uint256 lessDebt, uint256 poolReward, uint256 treasuryReward) = (0, 0, 0, 0);
 
         // 1. True up redeemable pool
         uint256 totalRedeemable = totalRedeemable();
@@ -80,21 +80,26 @@ contract Comptroller is Setters {
 
             // Get new redeemable coupons
             newRedeemable = totalCoupons.sub(totalRedeemable);
-            // Pad with Pool's potential cut
-            newRedeemable = newRedeemable.mul(100).div(SafeMath.sub(100, Constants.getOraclePoolRatio()));
+            // Pad with Pool's and Treasury's potential cut
+            newRedeemable = newRedeemable.mul(100).div(SafeMath.sub(100, SafeMath.add(Constants.getOraclePoolRatio(), Constants.getTreasuryRatio())));
             // Cap at newSupply
             newRedeemable = newRedeemable > newSupply ? newSupply : newRedeemable;
             // Determine Pool's final cut
             poolReward = newRedeemable.mul(Constants.getOraclePoolRatio()).div(100);
+            // Determine Treasury's final cut
+            treasuryReward = newRedeemable.mul(Constants.getTreasuryRatio()).div(100);
             // Determine Redeemable's final cut
-            newRedeemable = newRedeemable.sub(poolReward);
+            newRedeemable = newRedeemable.sub(poolReward).sub(treasuryReward);
             
             mintToPool(poolReward);
+            mintToTreasury(treasuryReward);
             mintToRedeemable(newRedeemable);
 
             newSupply = newSupply.sub(poolReward);
+            newSupply = newSupply.sub(treasuryReward);
             newSupply = newSupply.sub(newRedeemable);
         }
+
         // 2. Eliminate debt
         uint256 totalDebt = totalDebt();
         if (newSupply > 0 && totalDebt > 0) {
@@ -109,10 +114,11 @@ contract Comptroller is Setters {
             newSupply = 0;
         }
         if (newSupply > 0) {
-            mintToBonded(newSupply);
+            treasuryReward = treasuryReward.add(mintToBonded(newSupply));
+            newSupply = newSupply.sub(treasuryReward);
         }
 
-        return (newRedeemable, lessDebt, newSupply.add(poolReward));
+        return (newRedeemable, lessDebt, newSupply + poolReward, treasuryReward);
     }
 
     function resetDebt(Decimal.D256 memory targetDebtRatio) internal {
@@ -133,7 +139,7 @@ contract Comptroller is Setters {
         );
     }
 
-    function mintToBonded(uint256 amount) private {
+    function mintToBonded(uint256 amount) private returns (uint256) {
         Require.that(
             totalBonded() > 0,
             FILE,
@@ -141,12 +147,16 @@ contract Comptroller is Setters {
         );
 
         uint256 poolAmount = amount.mul(Constants.getOraclePoolRatio()).div(100);
-        uint256 daoAmount = amount > poolAmount ? amount.sub(poolAmount) : 0;
+        uint256 treasuryAmount = amount.mul(Constants.getTreasuryRatio()).div(100);
+        uint256 daoAmount = amount > poolAmount.add(treasuryAmount) ? amount.sub(poolAmount).sub(treasuryAmount) : 0;
 
         mintToPool(poolAmount);
+        mintToTreasury(treasuryAmount);
         mintToDAO(daoAmount);
 
         balanceCheck();
+
+        return treasuryAmount;
     }
 
     function mintToDAO(uint256 amount) private {
@@ -159,6 +169,12 @@ contract Comptroller is Setters {
     function mintToPool(uint256 amount) private {
         if (amount > 0) {
             dollar().mint(pool(), amount);
+        }
+    }
+
+    function mintToTreasury(uint256 amount) private {
+        if (amount > 0) {
+            dollar().mint(treasury(), amount);
         }
     }
 

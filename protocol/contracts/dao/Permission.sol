@@ -46,6 +46,16 @@ contract Permission is Setters {
         _;
     }
 
+    modifier onlyPool(address account) {
+        Require.that(
+            _state.provider.pool == account,
+            FILE,
+            "Account isn't pool"
+        );
+
+        _;
+    }
+
     modifier initializer() {
         Require.that(
             !isInitialized(implementation()),

@@ -65,17 +65,26 @@ contract Bonding is Setters, Permission {
     }
 
     function bond(uint256 value) external onlyFrozenOrFluid(msg.sender) {
-        unfreeze(msg.sender);
+        bondInternal(msg.sender, value);
+        decrementBalanceOfStaged(msg.sender, value, "Bonding: insufficient staged balance");
+    }
+
+    function bondFromPool(address account, uint256 value) external onlyFrozenOrFluid(account) onlyPool(msg.sender) {
+        //no need to check if we actually received the expected amount since this function can only be called by the pool
+        bondInternal(account, value);
+    }
+
+    function bondInternal(address account, uint256 value) internal {
+        unfreeze(account);
 
         uint256 balance = totalBonded() == 0 ?
             value.mul(Constants.getInitialStakeMultiple()) :
             value.mul(totalSupply()).div(totalBonded());
-        incrementBalanceOf(msg.sender, balance);
+        incrementBalanceOf(account, balance);
 
         incrementTotalBonded(value);
-        decrementBalanceOfStaged(msg.sender, value, "Bonding: insufficient staged balance");
 
-        emit Bond(msg.sender, epoch().add(1), balance, value);
+        emit Bond(account, epoch().add(1), balance, value);
     }
 
     function unbond(uint256 value) external onlyFrozenOrFluid(msg.sender) {

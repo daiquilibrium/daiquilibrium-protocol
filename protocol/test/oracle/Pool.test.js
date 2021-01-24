@@ -18,15 +18,15 @@ async function incrementEpoch(dao) {
 }
 
 describe('Pool', function () {
-  const [ ownerAddress, userAddress, userAddress1, userAddress2, mockDao ] = accounts;
+  const [ownerAddress, userAddress, userAddress1, userAddress2, mockDao] = accounts;
 
   beforeEach(async function () {
-    this.dao = await MockSettableDAO.new({from: ownerAddress, gas: 8000000});
+    this.dao = await MockSettableDAO.new({ from: ownerAddress, gas: 8000000 });
     await this.dao.set(1);
-    this.dollar = await MockToken.new("Daiquilibrium", "DAIQ", 18, {from: ownerAddress, gas: 8000000});
-    this.dai = await MockToken.new("DAI", "DAI", 18, {from: ownerAddress, gas: 8000000});
-    this.univ2 = await MockUniswapV2PairLiquidity.new({from: ownerAddress, gas: 8000000});
-    this.pool = await MockPool.new(this.dao.address, this.dai.address, this.univ2.address, {from: ownerAddress, gas: 8000000});
+    this.dollar = await MockToken.new("Daiquilibrium", "DAIQ", 18, { from: ownerAddress, gas: 8000000 });
+    this.dai = await MockToken.new("DAI", "DAI", 18, { from: ownerAddress, gas: 8000000 });
+    this.univ2 = await MockUniswapV2PairLiquidity.new({ from: ownerAddress, gas: 8000000 });
+    this.pool = await MockPool.new(this.dao.address, this.dai.address, this.univ2.address, { from: ownerAddress, gas: 8000000 });
     await this.pool.set(this.dao.address, this.dollar.address, this.univ2.address);
   });
 
@@ -40,9 +40,9 @@ describe('Pool', function () {
     describe('when deposit', function () {
       beforeEach(async function () {
         await this.univ2.faucet(userAddress, 1000);
-        await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
+        await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
 
-        this.result = await this.pool.deposit(1000, {from: userAddress});
+        this.result = await this.pool.deposit(1000, { from: userAddress });
         this.txHash = this.result.tx;
       });
 
@@ -75,10 +75,10 @@ describe('Pool', function () {
       describe('simple', function () {
         beforeEach(async function () {
           await this.univ2.faucet(userAddress, 1000);
-          await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
-          await this.pool.deposit(1000, {from: userAddress});
+          await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
+          await this.pool.deposit(1000, { from: userAddress });
 
-          this.result = await this.pool.withdraw(1000, {from: userAddress});
+          this.result = await this.pool.withdraw(1000, { from: userAddress });
           this.txHash = this.result.tx;
         });
 
@@ -110,16 +110,16 @@ describe('Pool', function () {
       describe('too much', function () {
         beforeEach(async function () {
           await this.univ2.faucet(userAddress, 1000);
-          await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
-          await this.pool.deposit(1000, {from: userAddress});
+          await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
+          await this.pool.deposit(1000, { from: userAddress });
 
           await this.univ2.faucet(userAddress1, 10000);
-          await this.univ2.approve(this.pool.address, 10000, {from: userAddress1});
-          await this.pool.deposit(10000, {from: userAddress1});
+          await this.univ2.approve(this.pool.address, 10000, { from: userAddress1 });
+          await this.pool.deposit(10000, { from: userAddress1 });
         });
 
         it('reverts', async function () {
-          await expectRevert(this.pool.withdraw(2000, {from: userAddress}), "insufficient staged balance");
+          await expectRevert(this.pool.withdraw(2000, { from: userAddress }), "insufficient staged balance");
         });
       });
     });
@@ -127,18 +127,18 @@ describe('Pool', function () {
     describe('when claim', function () {
       beforeEach(async function () {
         await this.univ2.faucet(userAddress, 1000);
-        await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
-        await this.pool.deposit(1000, {from: userAddress});
-        await this.pool.bond(1000, {from: userAddress});
+        await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
+        await this.pool.deposit(1000, { from: userAddress });
+        await this.pool.bond(1000, { from: userAddress });
         await this.dao.set((await this.dao.epoch()) + 1);
         await this.dollar.mint(this.pool.address, 1000);
-        await this.pool.unbond(1000, {from: userAddress});
+        await this.pool.unbond(1000, { from: userAddress });
         await this.dao.set((await this.dao.epoch()) + 1);
       });
 
       describe('simple', function () {
         beforeEach(async function () {
-          this.result = await this.pool.claim(1000, {from: userAddress});
+          this.result = await this.pool.claim(1000, { from: userAddress });
           this.txHash = this.result.tx;
         });
 
@@ -173,7 +173,7 @@ describe('Pool', function () {
         });
 
         it('reverts', async function () {
-          await expectRevert(this.pool.claim(2000, {from: userAddress}), "insufficient claimable balance");
+          await expectRevert(this.pool.claim(2000, { from: userAddress }), "insufficient claimable balance");
         });
       });
     });
@@ -183,10 +183,10 @@ describe('Pool', function () {
         describe('simple', function () {
           beforeEach(async function () {
             await this.univ2.faucet(userAddress, 1000);
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
-            await this.pool.deposit(1000, {from: userAddress});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
+            await this.pool.deposit(1000, { from: userAddress });
 
-            this.result = await this.pool.bond(1000, {from: userAddress});
+            this.result = await this.pool.bond(1000, { from: userAddress });
             this.txHash = this.result.tx;
           });
 
@@ -219,10 +219,10 @@ describe('Pool', function () {
         describe('partial', function () {
           beforeEach(async function () {
             await this.univ2.faucet(userAddress, 1000);
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
-            await this.pool.deposit(800, {from: userAddress});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
+            await this.pool.deposit(800, { from: userAddress });
 
-            this.result = await this.pool.bond(500, {from: userAddress});
+            this.result = await this.pool.bond(500, { from: userAddress });
             this.txHash = this.result.tx;
           });
 
@@ -255,23 +255,23 @@ describe('Pool', function () {
         describe('multiple', function () {
           beforeEach(async function () {
             await this.univ2.faucet(userAddress1, 1000);
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress1});
-            await this.pool.deposit(1000, {from: userAddress1});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress1 });
+            await this.pool.deposit(1000, { from: userAddress1 });
 
             await this.univ2.faucet(userAddress2, 1000);
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress2});
-            await this.pool.deposit(1000, {from: userAddress2});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress2 });
+            await this.pool.deposit(1000, { from: userAddress2 });
 
-            await this.pool.bond(600, {from: userAddress1});
-            await this.pool.bond(400, {from: userAddress2});
+            await this.pool.bond(600, { from: userAddress1 });
+            await this.pool.bond(400, { from: userAddress2 });
 
             await incrementEpoch(this.dao);
 
             await this.univ2.faucet(userAddress, 1000);
-            await this.univ2.approve(this.pool.address, 800, {from: userAddress});
-            await this.pool.deposit(800, {from: userAddress});
+            await this.univ2.approve(this.pool.address, 800, { from: userAddress });
+            await this.pool.deposit(800, { from: userAddress });
 
-            this.result = await this.pool.bond(500, {from: userAddress});
+            this.result = await this.pool.bond(500, { from: userAddress });
             this.txHash = this.result.tx;
           });
 
@@ -307,10 +307,10 @@ describe('Pool', function () {
           beforeEach(async function () {
             await this.univ2.faucet(userAddress, 1000);
             await this.dollar.mint(this.pool.address, 1000);
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
-            await this.pool.deposit(1000, {from: userAddress});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
+            await this.pool.deposit(1000, { from: userAddress });
 
-            this.result = await this.pool.bond(1000, {from: userAddress});
+            this.result = await this.pool.bond(1000, { from: userAddress });
             this.txHash = this.result.tx;
           });
 
@@ -343,10 +343,10 @@ describe('Pool', function () {
         describe('after bond', function () {
           beforeEach(async function () {
             await this.univ2.faucet(userAddress, 1000);
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
-            await this.pool.deposit(800, {from: userAddress});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
+            await this.pool.deposit(800, { from: userAddress });
 
-            this.result = await this.pool.bond(500, {from: userAddress});
+            this.result = await this.pool.bond(500, { from: userAddress });
             this.txHash = this.result.tx;
 
             await this.dollar.mint(this.pool.address, 1000);
@@ -382,24 +382,24 @@ describe('Pool', function () {
           beforeEach(async function () {
             await this.univ2.faucet(userAddress1, 1000);
             await this.dollar.mint(this.pool.address, new BN(1000));
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress1});
-            await this.pool.deposit(1000, {from: userAddress1});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress1 });
+            await this.pool.deposit(1000, { from: userAddress1 });
 
             await this.univ2.faucet(userAddress2, 1000);
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress2});
-            await this.pool.deposit(1000, {from: userAddress2});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress2 });
+            await this.pool.deposit(1000, { from: userAddress2 });
 
-            await this.pool.bond(600, {from: userAddress1});
-            await this.pool.bond(400, {from: userAddress2});
+            await this.pool.bond(600, { from: userAddress1 });
+            await this.pool.bond(400, { from: userAddress2 });
 
             await incrementEpoch(this.dao);
             await this.dollar.mint(this.pool.address, new BN(1000));
 
             await this.univ2.faucet(userAddress, 1000);
-            await this.univ2.approve(this.pool.address, 800, {from: userAddress});
-            await this.pool.deposit(800, {from: userAddress});
+            await this.univ2.approve(this.pool.address, 800, { from: userAddress });
+            await this.pool.deposit(800, { from: userAddress });
 
-            this.result = await this.pool.bond(500, {from: userAddress});
+            this.result = await this.pool.bond(500, { from: userAddress });
             this.txHash = this.result.tx;
           });
 
@@ -436,24 +436,24 @@ describe('Pool', function () {
         describe('multiple without reward first', function () {
           beforeEach(async function () {
             await this.univ2.faucet(userAddress1, 1000);
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress1});
-            await this.pool.deposit(1000, {from: userAddress1});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress1 });
+            await this.pool.deposit(1000, { from: userAddress1 });
 
             await this.univ2.faucet(userAddress2, 1000);
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress2});
-            await this.pool.deposit(1000, {from: userAddress2});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress2 });
+            await this.pool.deposit(1000, { from: userAddress2 });
 
-            await this.pool.bond(600, {from: userAddress1});
-            await this.pool.bond(400, {from: userAddress2});
+            await this.pool.bond(600, { from: userAddress1 });
+            await this.pool.bond(400, { from: userAddress2 });
 
             await incrementEpoch(this.dao);
             await this.dollar.mint(this.pool.address, new BN(1000).mul(INITIAL_STAKE_MULTIPLE));
 
             await this.univ2.faucet(userAddress, 1000);
-            await this.univ2.approve(this.pool.address, 800, {from: userAddress});
-            await this.pool.deposit(800, {from: userAddress});
+            await this.univ2.approve(this.pool.address, 800, { from: userAddress });
+            await this.pool.deposit(800, { from: userAddress });
 
-            this.result = await this.pool.bond(500, {from: userAddress});
+            this.result = await this.pool.bond(500, { from: userAddress });
             this.txHash = this.result.tx;
           });
 
@@ -489,20 +489,96 @@ describe('Pool', function () {
       });
     });
 
+    describe('when bondRewardsToDAO', function () {
+      beforeEach(async function () {
+        await this.univ2.faucet(userAddress, 1000);
+        await this.dollar.mint(this.pool.address, 1000);
+        await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
+        await this.pool.deposit(1000, { from: userAddress });
+
+        await this.pool.bond(1000, { from: userAddress });
+
+        for (let i = 0; i < 12; i ++) {
+          await incrementEpoch(this.dao);
+        }
+      });
+
+      describe('single', function () {
+        beforeEach(async function () {
+          this.result = await this.pool.bondRewardsToDAO(1000, { from: userAddress });
+        });
+
+        it('updates user balance', async function () {
+          expect(await this.pool.balanceOfRewarded(userAddress)).bignumber.zero;
+          expect(await this.dollar.balanceOf(this.pool.address)).bignumber.zero;
+          expect(await this.pool.totalRewarded()).bignumber.zero;
+        });
+
+        it('calls bondFromPool', async function () {
+          expect(await this.dao.bonds(userAddress)).bignumber.equal(new BN(1000));
+        });
+
+        it('stays frozen', async function () {
+          expect(await this.pool.statusOf(userAddress)).bignumber.zero;
+        });
+      });
+
+      describe('partial', function () {
+        beforeEach(async function () {
+          this.result = await this.pool.bondRewardsToDAO(500, { from: userAddress });
+        });
+
+        it('updates user balance', async function () {
+          expect(await this.pool.balanceOfRewarded(userAddress)).bignumber.equal(new BN(500));
+          expect(await this.dollar.balanceOf(this.pool.address)).bignumber.equal(new BN(500));
+          expect(await this.pool.totalRewarded()).bignumber.equal(new BN(500));
+        });
+
+        it('calls bondFromPool', async function () {
+          expect(await this.dao.bonds(userAddress)).bignumber.equal(new BN(500));
+        });
+
+        it('stays frozen', async function () {
+          expect(await this.pool.statusOf(userAddress)).bignumber.zero;
+        });
+      });
+
+      describe('multiple', function () {
+        beforeEach(async function () {
+          await this.pool.bondRewardsToDAO(500, { from: userAddress });
+          await this.pool.bondRewardsToDAO(300, { from: userAddress });
+        });
+
+        it('updates user balance', async function () {
+          expect(await this.pool.balanceOfRewarded(userAddress)).bignumber.equal(new BN(200));
+          expect(await this.dollar.balanceOf(this.pool.address)).bignumber.equal(new BN(200));
+          expect(await this.pool.totalRewarded()).bignumber.equal(new BN(200));
+        });
+
+        it('calls bondFromPool', async function () {
+          expect(await this.dao.bonds(userAddress)).bignumber.equal(new BN(800));
+        });
+
+        it('stays frozen', async function () {
+          expect(await this.pool.statusOf(userAddress)).bignumber.zero;
+        });
+      });
+    });
+
     describe('when unbond', function () {
       describe('without reward', function () {
         beforeEach(async function () {
           await this.univ2.faucet(userAddress, 1000);
-          await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
-          await this.pool.deposit(1000, {from: userAddress});
+          await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
+          await this.pool.deposit(1000, { from: userAddress });
 
-          await this.pool.bond(1000, {from: userAddress});
+          await this.pool.bond(1000, { from: userAddress });
           await incrementEpoch(this.dao);
         });
 
         describe('simple', function () {
           beforeEach(async function () {
-            this.result = await this.pool.unbond(new BN(1000), {from: userAddress});
+            this.result = await this.pool.unbond(new BN(1000), { from: userAddress });
             this.txHash = this.result.tx;
           });
 
@@ -535,7 +611,7 @@ describe('Pool', function () {
 
         describe('partial', function () {
           beforeEach(async function () {
-            this.result = await this.pool.unbond(new BN(800), {from: userAddress});
+            this.result = await this.pool.unbond(new BN(800), { from: userAddress });
             this.txHash = this.result.tx;
           });
 
@@ -569,19 +645,19 @@ describe('Pool', function () {
         describe('multiple', function () {
           beforeEach(async function () {
             await this.univ2.faucet(userAddress1, 1000);
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress1});
-            await this.pool.deposit(1000, {from: userAddress1});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress1 });
+            await this.pool.deposit(1000, { from: userAddress1 });
 
             await this.univ2.faucet(userAddress2, 1000);
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress2});
-            await this.pool.deposit(1000, {from: userAddress2});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress2 });
+            await this.pool.deposit(1000, { from: userAddress2 });
 
-            await this.pool.bond(600, {from: userAddress1});
-            await this.pool.bond(400, {from: userAddress2});
+            await this.pool.bond(600, { from: userAddress1 });
+            await this.pool.bond(400, { from: userAddress2 });
 
             await incrementEpoch(this.dao);
 
-            this.result = await this.pool.unbond(new BN(800), {from: userAddress});
+            this.result = await this.pool.unbond(new BN(800), { from: userAddress });
             this.txHash = this.result.tx;
           });
 
@@ -616,17 +692,17 @@ describe('Pool', function () {
       describe('with reward', function () {
         beforeEach(async function () {
           await this.univ2.faucet(userAddress, 1000);
-          await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
-          await this.pool.deposit(1000, {from: userAddress});
+          await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
+          await this.pool.deposit(1000, { from: userAddress });
 
-          await this.pool.bond(1000, {from: userAddress});
+          await this.pool.bond(1000, { from: userAddress });
           await incrementEpoch(this.dao);
           await this.dollar.mint(this.pool.address, 1000);
         });
 
         describe('simple', function () {
           beforeEach(async function () {
-            this.result = await this.pool.unbond(new BN(1000), {from: userAddress});
+            this.result = await this.pool.unbond(new BN(1000), { from: userAddress });
             this.txHash = this.result.tx;
           });
 
@@ -661,7 +737,7 @@ describe('Pool', function () {
 
         describe('partial', function () {
           beforeEach(async function () {
-            this.result = await this.pool.unbond(new BN(800), {from: userAddress});
+            this.result = await this.pool.unbond(new BN(800), { from: userAddress });
             this.txHash = this.result.tx;
           });
 
@@ -697,20 +773,20 @@ describe('Pool', function () {
         describe('multiple', function () {
           beforeEach(async function () {
             await this.univ2.faucet(userAddress1, 1000);
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress1});
-            await this.pool.deposit(1000, {from: userAddress1});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress1 });
+            await this.pool.deposit(1000, { from: userAddress1 });
 
             await this.univ2.faucet(userAddress2, 1000);
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress2});
-            await this.pool.deposit(1000, {from: userAddress2});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress2 });
+            await this.pool.deposit(1000, { from: userAddress2 });
 
-            await this.pool.bond(600, {from: userAddress1});
-            await this.pool.bond(400, {from: userAddress2});
+            await this.pool.bond(600, { from: userAddress1 });
+            await this.pool.bond(400, { from: userAddress2 });
 
             await incrementEpoch(this.dao);
             await this.dollar.mint(this.pool.address, 1000);
 
-            this.result = await this.pool.unbond(new BN(800), {from: userAddress});
+            this.result = await this.pool.unbond(new BN(800), { from: userAddress });
             this.txHash = this.result.tx;
           });
 
@@ -752,24 +828,24 @@ describe('Pool', function () {
         describe('potential subtraction underflow', function () {
           beforeEach(async function () {
             await this.univ2.faucet(userAddress1, 1000);
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress1});
-            await this.pool.deposit(1000, {from: userAddress1});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress1 });
+            await this.pool.deposit(1000, { from: userAddress1 });
 
             await this.univ2.faucet(userAddress2, 1000);
-            await this.univ2.approve(this.pool.address, 1000, {from: userAddress2});
-            await this.pool.deposit(1000, {from: userAddress2});
+            await this.univ2.approve(this.pool.address, 1000, { from: userAddress2 });
+            await this.pool.deposit(1000, { from: userAddress2 });
 
-            await this.pool.bond(600, {from: userAddress1});
-            await this.pool.bond(500, {from: userAddress2});
+            await this.pool.bond(600, { from: userAddress1 });
+            await this.pool.bond(500, { from: userAddress2 });
 
             await incrementEpoch(this.dao);
             await this.dollar.mint(this.pool.address, 1000);
 
-            await this.pool.unbond(new BN(1000), {from: userAddress});
-            await this.pool.bond(new BN(1000), {from: userAddress});
-            await this.pool.unbond(new BN(600), {from: userAddress});
+            await this.pool.unbond(new BN(1000), { from: userAddress });
+            await this.pool.bond(new BN(1000), { from: userAddress });
+            await this.pool.unbond(new BN(600), { from: userAddress });
 
-            this.result = await this.pool.unbond(new BN(200), {from: userAddress});
+            this.result = await this.pool.unbond(new BN(200), { from: userAddress });
             this.txHash = this.result.tx;
           });
 
@@ -813,9 +889,9 @@ describe('Pool', function () {
     describe('when provide', function () {
       beforeEach(async function () {
         await this.univ2.faucet(userAddress, 1000);
-        await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
-        await this.pool.deposit(1000, {from: userAddress});
-        await this.pool.bond(1000, {from: userAddress});
+        await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
+        await this.pool.deposit(1000, { from: userAddress });
+        await this.pool.bond(1000, { from: userAddress });
 
         this.poolLockupEpochs = 12;
         for (var i = 0; i < this.poolLockupEpochs; i++) {
@@ -826,7 +902,7 @@ describe('Pool', function () {
 
       describe('not enough rewards', function () {
         it('reverts', async function () {
-          await expectRevert(this.pool.provide(2000, {from: userAddress}), "Pool: insufficient rewarded balance");
+          await expectRevert(this.pool.provide(2000, { from: userAddress }), "Pool: insufficient rewarded balance");
         });
       });
 
@@ -836,11 +912,11 @@ describe('Pool', function () {
 
         beforeEach(async function () {
           await this.dai.mint(userAddress, 1000);
-          await this.dai.approve(this.pool.address, 1000, {from: userAddress});
+          await this.dai.approve(this.pool.address, 1000, { from: userAddress });
 
           await this.univ2.set(1000, 1000, 10);
 
-          this.result = await this.pool.provide(1000, {from: userAddress});
+          this.result = await this.pool.provide(1000, { from: userAddress });
           this.txHash = this.result.tx;
         });
 
@@ -884,12 +960,12 @@ describe('Pool', function () {
 
         beforeEach(async function () {
           await this.dai.mint(userAddress, 3000);
-          await this.dai.approve(this.pool.address, 3000, {from: userAddress});
+          await this.dai.approve(this.pool.address, 3000, { from: userAddress });
 
           await this.univ2.faucet(userAddress1, 1000);
-          await this.univ2.approve(this.pool.address, 1000, {from: userAddress1});
-          await this.pool.deposit(1000, {from: userAddress1});
-          await this.pool.bond(1000, {from: userAddress1});
+          await this.univ2.approve(this.pool.address, 1000, { from: userAddress1 });
+          await this.pool.deposit(1000, { from: userAddress1 });
+          await this.pool.bond(1000, { from: userAddress1 });
 
           await incrementEpoch(this.dao);
           await this.dollar.mint(this.pool.address, 1000);
@@ -897,7 +973,7 @@ describe('Pool', function () {
           // 1000 DSD + 3000 dai
           await this.univ2.set(1000, 3000, 10);
 
-          this.result = await this.pool.provide(1000, {from: userAddress});
+          this.result = await this.pool.provide(1000, { from: userAddress });
           this.txHash = this.result.tx;
         });
 
@@ -940,10 +1016,10 @@ describe('Pool', function () {
     beforeEach(async function () {
       await this.dollar.mint(this.pool.address, 1000);
       await this.univ2.faucet(userAddress, 1000);
-      await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
-      await this.pool.deposit(1000, {from: userAddress});
+      await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
+      await this.pool.deposit(1000, { from: userAddress });
 
-      await this.pool.bond(500, {from: userAddress});
+      await this.pool.bond(500, { from: userAddress });
     });
 
     it('is fluid', async function () {
@@ -953,32 +1029,32 @@ describe('Pool', function () {
     describe('when deposit', function () {
       it('completes', async function () {
         await this.univ2.faucet(userAddress, 1000);
-        await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
-        await this.pool.deposit(1000, {from: userAddress});
+        await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
+        await this.pool.deposit(1000, { from: userAddress });
       });
     });
 
     describe('when withdraw', function () {
       it('reverts', async function () {
-        await expectRevert(this.pool.withdraw(1000, {from: userAddress}), "Pool: Not frozen");
+        await expectRevert(this.pool.withdraw(1000, { from: userAddress }), "Pool: Not frozen");
       });
     });
 
     describe('when claim', function () {
       it('reverts', async function () {
-        await expectRevert(this.pool.claim(1000, {from: userAddress}), "Pool: Not frozen");
+        await expectRevert(this.pool.claim(1000, { from: userAddress }), "Pool: Not frozen");
       });
     });
 
     describe('when provide', function () {
       it('reverts', async function () {
-        await expectRevert(this.pool.provide(1000, {from: userAddress}), "Pool: Not frozen");
+        await expectRevert(this.pool.provide(1000, { from: userAddress }), "Pool: Not frozen");
       });
     });
 
     describe('when bond', function () {
       beforeEach(async function () {
-        this.result = await this.pool.bond(500, {from: userAddress});
+        this.result = await this.pool.bond(500, { from: userAddress });
         this.txHash = this.result.tx;
       });
 
@@ -1010,7 +1086,7 @@ describe('Pool', function () {
 
     describe('when unbond', function () {
       beforeEach(async function () {
-        this.result = await this.pool.unbond(new BN(500), {from: userAddress});
+        this.result = await this.pool.unbond(new BN(500), { from: userAddress });
         this.txHash = this.result.tx;
       });
 
@@ -1045,19 +1121,19 @@ describe('Pool', function () {
   describe('when pause', function () {
     beforeEach(async function () {
       await this.univ2.faucet(userAddress, 1000);
-      await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
-      await this.pool.deposit(1000, {from: userAddress});
-      await this.pool.bond(1000, {from: userAddress});
+      await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
+      await this.pool.deposit(1000, { from: userAddress });
+      await this.pool.bond(1000, { from: userAddress });
       await this.dao.set((await this.dao.epoch()) + 1);
       await this.dollar.mint(this.pool.address, 1000);
-      await this.pool.unbond(500, {from: userAddress});
+      await this.pool.unbond(500, { from: userAddress });
       await this.dao.set((await this.dao.epoch()) + 1);
     });
 
     describe('as dao', function () {
       beforeEach(async function () {
         await this.pool.set(mockDao, this.dollar.address, this.univ2.address);
-        await this.pool.emergencyPause({from: mockDao});
+        await this.pool.emergencyPause({ from: mockDao });
         await this.pool.set(this.dao.address, this.dollar.address, this.univ2.address);
       });
 
@@ -1066,20 +1142,20 @@ describe('Pool', function () {
       });
 
       it('reverts on deposit', async function () {
-        await expectRevert(this.pool.deposit(2000, {from: userAddress}), "Paused");
+        await expectRevert(this.pool.deposit(2000, { from: userAddress }), "Paused");
       });
 
       it('reverts on bond', async function () {
-        await expectRevert(this.pool.bond(2000, {from: userAddress}), "Paused");
+        await expectRevert(this.pool.bond(2000, { from: userAddress }), "Paused");
       });
 
       it('reverts on provide', async function () {
-        await expectRevert(this.pool.provide(2000, {from: userAddress}), "Paused");
+        await expectRevert(this.pool.provide(2000, { from: userAddress }), "Paused");
       });
 
       describe('withdraw', function () {
         beforeEach(async function () {
-          await this.pool.withdraw(200, {from: userAddress})
+          await this.pool.withdraw(200, { from: userAddress })
         });
 
         it('basic withdraw check', async function () {
@@ -1089,7 +1165,7 @@ describe('Pool', function () {
 
       describe('unbond', function () {
         beforeEach(async function () {
-          await this.pool.unbond(200, {from: userAddress})
+          await this.pool.unbond(200, { from: userAddress })
         });
 
         it('basic unbond check', async function () {
@@ -1100,7 +1176,7 @@ describe('Pool', function () {
 
       describe('claim', function () {
         beforeEach(async function () {
-          await this.pool.claim(200, {from: userAddress})
+          await this.pool.claim(200, { from: userAddress })
         });
 
         it('basic claim check', async function () {
@@ -1111,7 +1187,7 @@ describe('Pool', function () {
 
     describe('as not dao', function () {
       it('reverts', async function () {
-        await expectRevert(this.pool.emergencyPause({from: userAddress}), "Not dao");
+        await expectRevert(this.pool.emergencyPause({ from: userAddress }), "Not dao");
       });
     });
   });
@@ -1119,9 +1195,9 @@ describe('Pool', function () {
   describe('when emergency withdraw', function () {
     beforeEach(async function () {
       await this.univ2.faucet(userAddress, 1000);
-      await this.univ2.approve(this.pool.address, 1000, {from: userAddress});
-      await this.pool.deposit(1000, {from: userAddress});
-      await this.pool.bond(1000, {from: userAddress});
+      await this.univ2.approve(this.pool.address, 1000, { from: userAddress });
+      await this.pool.deposit(1000, { from: userAddress });
+      await this.pool.bond(1000, { from: userAddress });
       await this.dao.set((await this.dao.epoch()) + 1);
       await this.dollar.mint(this.pool.address, 1000);
     });
@@ -1129,8 +1205,8 @@ describe('Pool', function () {
     describe('as dao', function () {
       beforeEach(async function () {
         await this.pool.set(mockDao, this.dollar.address, this.univ2.address);
-        await this.pool.emergencyWithdraw(this.univ2.address, 1000, {from: mockDao});
-        await this.pool.emergencyWithdraw(this.dollar.address, 1000, {from: mockDao});
+        await this.pool.emergencyWithdraw(this.univ2.address, 1000, { from: mockDao });
+        await this.pool.emergencyWithdraw(this.dollar.address, 1000, { from: mockDao });
       });
 
       it('transfers funds to the dao', async function () {
@@ -1143,7 +1219,7 @@ describe('Pool', function () {
 
     describe('as not dao', function () {
       it('reverts', async function () {
-        await expectRevert(this.pool.emergencyWithdraw(this.univ2.address, 1000, {from: userAddress}), "Not dao");
+        await expectRevert(this.pool.emergencyWithdraw(this.univ2.address, 1000, { from: userAddress }), "Not dao");
       });
     });
   });

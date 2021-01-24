@@ -23,8 +23,12 @@ import "./MockComptroller.sol";
 import "./MockState.sol";
 
 contract MockRegulator is MockComptroller, Regulator {
-    constructor (address oracle, address pool) MockComptroller(pool) public {
+
+    address private _treasury;
+
+    constructor (address oracle, address pool, address treasury) MockComptroller(pool) public {
         _state.provider.oracle = IOracle(oracle);
+        _treasury = treasury;
     }
 
     function stepE() external {
@@ -33,5 +37,9 @@ contract MockRegulator is MockComptroller, Regulator {
 
     function bootstrappingAt(uint256 epoch) public view returns (bool) {
         return epoch <= 5;
+    }
+
+    function treasury() public view returns (address) {
+        return _treasury;
     }
 }

@@ -25,7 +25,9 @@ contract MockPool is Pool {
     address private _dollar;
     address private _univ2;
 
-    constructor(address dollar, address dai, address univ2) Pool(dollar, univ2) public {
+    constructor(address dollar, address dai, address univ2) Pool() public {
+        _state.provider.dollar = IDollar(dollar);
+        _state.provider.univ2 = IERC20(univ2);
         _dai = dai;
     }
 

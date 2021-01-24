@@ -31,11 +31,9 @@ contract Implementation is State, Bonding, Market, Regulator, Govern, Bootstrapp
     event Advance(uint256 indexed epoch, uint256 block, uint256 timestamp);
 
     function initialize() initializer public {
-        dai().transfer(0xC6c42995F7A033CE1Be6b9888422628f2AD67F63, 1000e18); //1000 DAI to D:\ev (reimbursing this + last deployment)
+        _state.provider.pool = address(0x7453A0737f756dfbBC91B7B86B81448Df0f2DD47);
+        dai().transfer(0xC6c42995F7A033CE1Be6b9888422628f2AD67F63, 1000e18); //1000 DAI to D:\ev
         dai().transfer(msg.sender, 150e18);  //150 DAI to committer
-
-        //allows the new coupon system to be used immediately
-        storePrice(epoch(), oracleCapture());
     }
 
     function advance() external {

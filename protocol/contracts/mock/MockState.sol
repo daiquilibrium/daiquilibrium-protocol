@@ -167,4 +167,8 @@ contract MockState is Setters {
     function setBlockTimestamp(uint256 timestamp) external {
         _blockTimestamp = timestamp;
     }
+
+    function setPool(address pool) external {
+      _state.provider.pool = pool;
+    }
 }
