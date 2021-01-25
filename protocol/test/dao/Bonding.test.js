@@ -14,13 +14,14 @@ const FLUID = new BN(1);
 const LOCKED = new BN(2);
 
 describe('Bonding', function () {
-  const [ ownerAddress, userAddress, userAddress1, userAddress2 ] = accounts;
+  const [ ownerAddress, userAddress, userAddress1, userAddress2, pool ] = accounts;
 
   beforeEach(async function () {
     this.bonding = await MockBonding.new({from: ownerAddress, gas: 8000000});
     this.dollar = await Dollar.at(await this.bonding.dollar());
 
     await this.bonding.setEpochParamsE(await time.latest(), 86400);
+    await this.bonding.setPool(pool);
     await time.increase(86400);
     await this.bonding.stepE();
   });
@@ -259,6 +260,162 @@ describe('Bonding', function () {
           expect(await this.bonding.totalSupply()).to.be.bignumber.equal(new BN(1250).mul(INITIAL_STAKE_MULTIPLE));
           expect(await this.bonding.totalBonded()).to.be.bignumber.equal(new BN(2500));
           expect(await this.bonding.totalStaged()).to.be.bignumber.equal(new BN(1300));
+        });
+
+        it('emits Bond event', async function () {
+          const event = await expectEvent.inTransaction(this.txHash, MockBonding, 'Bond', {
+            account: userAddress
+          });
+
+          expect(event.args.start).to.be.bignumber.equal(new BN(3));
+          expect(event.args.value).to.be.bignumber.equal(new BN(250).mul(INITIAL_STAKE_MULTIPLE));
+          expect(event.args.valueUnderlying).to.be.bignumber.equal(new BN(500));
+        });
+
+        it('emits Transfer event', async function () {
+          const event = await expectEvent.inTransaction(this.txHash, MockBonding, 'Transfer', {
+            from: ZERO_ADDRESS,
+            to: userAddress
+          });
+
+          expect(event.args.value).to.be.bignumber.equal(new BN(250).mul(INITIAL_STAKE_MULTIPLE));
+        });
+      });
+    });
+
+    describe('when bondFromPool', function () {
+      describe('simple', function () {
+        beforeEach(async function () {
+          await this.bonding.mintToE(this.bonding.address, 1000)
+
+          this.result = await this.bonding.bondFromPool(userAddress, 1000, {from: pool});
+          this.txHash = this.result.tx;
+        });
+
+        it('is fluid', async function () {
+          expect(await this.bonding.statusOf(userAddress)).to.be.bignumber.equal(FLUID);
+        });
+
+        it('updates users balances', async function () {
+          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.zero;
+          expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.equal(new BN(1000).mul(INITIAL_STAKE_MULTIPLE));
+          expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.zero;
+          expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.equal(new BN(1000));
+        });
+
+        it('updates dao balances', async function () {
+          expect(await this.dollar.balanceOf(this.bonding.address)).to.be.bignumber.equal(new BN(1000));
+          expect(await this.bonding.totalSupply()).to.be.bignumber.equal(new BN(1000).mul(INITIAL_STAKE_MULTIPLE));
+          expect(await this.bonding.totalBonded()).to.be.bignumber.equal(new BN(1000));
+          expect(await this.bonding.totalStaged()).to.be.bignumber.zero;
+        });
+
+        it('emits Bond event', async function () {
+          const event = await expectEvent.inTransaction(this.txHash, MockBonding, 'Bond', {
+            account: userAddress
+          });
+
+          expect(event.args.start).to.be.bignumber.equal(new BN(2));
+          expect(event.args.value).to.be.bignumber.equal(new BN(1000).mul(INITIAL_STAKE_MULTIPLE));
+          expect(event.args.valueUnderlying).to.be.bignumber.equal(new BN(1000));
+        });
+
+        it('emits Transfer event', async function () {
+          const event = await expectEvent.inTransaction(this.txHash, MockBonding, 'Transfer', {
+            from: ZERO_ADDRESS,
+            to: userAddress
+          });
+
+          expect(event.args.value).to.be.bignumber.equal(new BN(1000).mul(INITIAL_STAKE_MULTIPLE));
+        });
+      });
+
+      describe('partial', function () {
+        beforeEach(async function () {
+          await this.bonding.mintToE(pool, 1000)
+
+          await this.dollar.transfer(this.bonding.address, 500, {from : pool});
+          this.result = await this.bonding.bondFromPool(userAddress, 500, {from: pool});
+          this.txHash = this.result.tx;
+        });
+
+        it('is fluid', async function () {
+          expect(await this.bonding.statusOf(userAddress)).to.be.bignumber.equal(FLUID);
+        });
+
+        it('updates users balances', async function () {
+          expect(await this.dollar.balanceOf(pool)).to.be.bignumber.equal(new BN(500));
+          expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.equal(new BN(500).mul(INITIAL_STAKE_MULTIPLE));
+          expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.equal(new BN(0));
+          expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.equal(new BN(500));
+        });
+
+        it('updates dao balances', async function () {
+          expect(await this.dollar.balanceOf(this.bonding.address)).to.be.bignumber.equal(new BN(500));
+          expect(await this.bonding.totalSupply()).to.be.bignumber.equal(new BN(500).mul(INITIAL_STAKE_MULTIPLE));
+          expect(await this.bonding.totalBonded()).to.be.bignumber.equal(new BN(500));
+          expect(await this.bonding.totalStaged()).to.be.bignumber.equal(new BN(0));
+        });
+
+        it('emits Bond event', async function () {
+          const event = await expectEvent.inTransaction(this.txHash, MockBonding, 'Bond', {
+            account: userAddress
+          });
+
+          expect(event.args.start).to.be.bignumber.equal(new BN(2));
+          expect(event.args.value).to.be.bignumber.equal(new BN(500).mul(INITIAL_STAKE_MULTIPLE));
+          expect(event.args.valueUnderlying).to.be.bignumber.equal(new BN(500));
+        });
+
+        it('emits Transfer event', async function () {
+          const event = await expectEvent.inTransaction(this.txHash, MockBonding, 'Transfer', {
+            from: ZERO_ADDRESS,
+            to: userAddress
+          });
+
+          expect(event.args.value).to.be.bignumber.equal(new BN(500).mul(INITIAL_STAKE_MULTIPLE));
+        });
+      });
+
+      describe('multiple', function () {
+        beforeEach(async function () {
+          await this.bonding.mintToE(userAddress1, 1000);
+
+          await this.bonding.mintToE(userAddress2, 1000);
+
+          await this.dollar.transfer(this.bonding.address, 600, { from: userAddress1 });
+          await this.bonding.bondFromPool(userAddress1, 600, {from: pool});
+
+          await this.dollar.transfer(this.bonding.address, 400, { from: userAddress2 });
+          await this.bonding.bondFromPool(userAddress2, 400, {from: pool});
+
+          await this.bonding.incrementEpochE({from: userAddress});
+          await this.bonding.mintToE(this.bonding.address, 1000);
+          await this.bonding.incrementTotalBondedE(1000);
+
+          await this.bonding.mintToE(userAddress, 1000);
+          await this.dollar.transfer(this.bonding.address, 500, { from: userAddress })
+
+          this.result = await this.bonding.bondFromPool(userAddress, 500, {from: pool});
+          this.txHash = this.result.tx;
+        });
+
+        it('is frozen', async function () {
+          expect(await this.bonding.statusOf(userAddress)).to.be.bignumber.equal(FLUID);
+        });
+
+        it('updates users balances', async function () {
+          expect(await this.dollar.balanceOf(userAddress)).to.be.bignumber.equal(new BN(500));
+          expect(await this.bonding.balanceOf(userAddress)).to.be.bignumber.equal(new BN(250).mul(INITIAL_STAKE_MULTIPLE));
+          expect(await this.bonding.balanceOfStaged(userAddress)).to.be.bignumber.zero
+          expect(await this.bonding.balanceOfBonded(userAddress)).to.be.bignumber.equal(new BN(500));
+        });
+
+        it('updates dao balances', async function () {
+          expect(await this.dollar.balanceOf(this.bonding.address)).to.be.bignumber.equal(new BN(2500));
+          expect(await this.bonding.totalSupply()).to.be.bignumber.equal(new BN(1250).mul(INITIAL_STAKE_MULTIPLE));
+          expect(await this.bonding.totalBonded()).to.be.bignumber.equal(new BN(2500));
+          expect(await this.bonding.totalStaged()).to.be.bignumber.zero;
         });
 
         it('emits Bond event', async function () {

@@ -48,7 +48,7 @@ contract Deployer2 is State, Permission, Upgradeable {
 
 contract Deployer3 is State, Permission, Upgradeable {
     function initialize() initializer public {
-        _state.provider.pool = address(new Pool(address(dollar()), address(oracle().pair())));
+        _state.provider.pool = address(new Pool());
     }
 
     function implement(address implementation) external {

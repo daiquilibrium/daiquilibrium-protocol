@@ -27,10 +27,10 @@ import "./Liquidity.sol";
 contract Pool is PoolSetters, Liquidity {
     using SafeMath for uint256;
 
-    constructor(address dollar, address univ2) public {
-        _state.provider.dao = IDAO(msg.sender);
-        _state.provider.dollar = IDollar(dollar);
-        _state.provider.univ2 = IERC20(univ2);
+    constructor() public {
+        _state.provider.dao = IDAO(0x0aF9087FE3e8e834F3339FE4bEE87705e84Fd488);
+        _state.provider.dollar = IDollar(0x73D9E335669462Cbdd6aa3AdaFe9efeE86a37Fe9);
+        _state.provider.univ2 = IERC20(0x26B4B107dCe673C00D59D71152136327cF6dFEBf);
     }
 
     bytes32 private constant FILE = "Pool";
@@ -107,6 +107,30 @@ contract Pool is PoolSetters, Liquidity {
         balanceCheck();
 
         emit Unbond(msg.sender, epoch().add(1), value, newClaimable);
+    }
+
+    function bondRewardsToDAO(uint256 value) external onlyFrozen(msg.sender) notPaused {
+        Require.that(
+            totalRewarded() > 0,
+            FILE,
+            "insufficient total rewarded"
+        );
+        
+        Require.that(
+            balanceOfRewarded(msg.sender) >= value,
+            FILE,
+            "insufficient rewarded balance"
+        );
+
+        uint256 balanceOfBonded = balanceOfBonded(msg.sender);
+        uint256 lessPhantom = balanceOfPhantom(msg.sender).mul(value).div(balanceOfBonded);
+
+        decrementBalanceOfPhantom(msg.sender, lessPhantom, "Pool: insufficient phantom balance");
+
+        dollar().transfer(address(dao()), value);
+        dao().bondFromPool(msg.sender, value);
+
+        balanceCheck();
     }
 
     function provide(uint256 value) external onlyFrozen(msg.sender) notPaused {

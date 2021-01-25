@@ -27,7 +27,7 @@ contract Market is Comptroller, Curve {
 
     bytes32 private constant FILE = "Market";
 
-    event CouponExpiration(uint256 indexed epoch, uint256 couponsExpired, uint256 lessRedeemable, uint256 lessDebt, uint256 newBonded);
+    event CouponExpiration(uint256 indexed epoch, uint256 couponsExpired, uint256 lessRedeemable, uint256 lessDebt, uint256 newBonded, uint256 newTreasury);
     event CouponPurchase(address indexed account, uint256 indexed epoch, uint256 dollarAmount, uint256 couponAmount);
     event CouponRedemption(address indexed account, uint256 indexed epoch, uint256 couponAmount);
     event CouponBurn(address indexed account, uint256 indexed epoch, uint256 couponAmount);
@@ -40,7 +40,7 @@ contract Market is Comptroller, Curve {
 
     function expireCouponsForEpoch(uint256 epoch) private {
         uint256 expiredAmount = expiringCoupons(epoch);
-        (uint256 lessRedeemable, uint256 lessDebt, uint256 newBonded) = (0, 0, 0);
+        (uint256 lessRedeemable, uint256 lessDebt, uint256 newBonded, uint256 newTreasury) = (0, 0, 0, 0);
 
         expireCoupons(epoch);
 
@@ -49,10 +49,10 @@ contract Market is Comptroller, Curve {
         if (totalRedeemable > totalCoupons) {
             lessRedeemable = totalRedeemable.sub(totalCoupons);
             burnRedeemable(lessRedeemable);
-            (, lessDebt, newBonded) = increaseSupply(lessRedeemable);
+            (, lessDebt, newBonded, newTreasury) = increaseSupply(lessRedeemable);
         }
 
-        emit CouponExpiration(epoch, expiredAmount, lessRedeemable, lessDebt, newBonded);
+        emit CouponExpiration(epoch, expiredAmount, lessRedeemable, lessDebt, newBonded, newTreasury);
     }
     
     function couponPremium(uint256 amount, uint256 expirationPeriod) public view returns (uint256) {

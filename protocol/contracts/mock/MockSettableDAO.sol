@@ -22,11 +22,17 @@ import "../oracle/IDAO.sol";
 contract MockSettableDAO is IDAO {
     uint256 internal _epoch;
 
+    mapping(address => uint256) public bonds;
+
     function set(uint256 epoch) external {
         _epoch = epoch;
     }
 
     function epoch() external view returns (uint256) {
         return _epoch;
+    }
+
+    function bondFromPool(address account, uint256 amount) external {
+      bonds[account] = bonds[account] + amount;
     }
 }

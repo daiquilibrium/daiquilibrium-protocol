@@ -67,7 +67,7 @@ library Constants {
     /* Regulator */
     uint256 private constant SUPPLY_CHANGE_DIVISOR = 12e18; // 12
     uint256 private constant SUPPLY_CHANGE_LIMIT = 10e16; // 10%
-    uint256 private constant ORACLE_POOL_RATIO = 60; // 60%
+    uint256 private constant ORACLE_POOL_RATIO = 30; // 30%
 
     /**
      * Getters
@@ -162,6 +162,10 @@ library Constants {
 
     function getOraclePoolRatio() internal pure returns (uint256) {
         return ORACLE_POOL_RATIO;
+    }
+
+    function getTreasuryRatio() internal pure returns (uint256) {
+        return 5; //5% to treasury
     }
 
     function getChainId() internal pure returns (uint256) {

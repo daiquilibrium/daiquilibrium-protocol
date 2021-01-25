@@ -465,7 +465,8 @@ describe('Market', function () {
                     expect(event.args.couponsExpired).to.be.bignumber.equal(new BN(184961));
                     expect(event.args.lessRedeemable).to.be.bignumber.equal(new BN(100000));
                     expect(event.args.lessDebt).to.be.bignumber.equal(new BN(0));
-                    expect(event.args.newBonded).to.be.bignumber.equal(new BN(100000));
+                    expect(event.args.newBonded).to.be.bignumber.equal(new BN(95000));
+                    expect(event.args.newTreasury).bignumber.equal(new BN(5000));
                 });
             });
 
@@ -496,7 +497,8 @@ describe('Market', function () {
                     expect(event.args.epoch).to.be.bignumber.equal(new BN(12));
                     expect(event.args.couponsExpired).to.be.bignumber.equal(new BN(92480));
                     expect(event.args.lessDebt).to.be.bignumber.equal(new BN(0));
-                    expect(event.args.newBonded).to.be.bignumber.equal(new BN(27749));
+                    expect(event.args.newBonded).to.be.bignumber.equal(new BN(26362));
+                    expect(event.args.newTreasury).bignumber.equal(new BN(1387));
                 });
             });
 
@@ -528,6 +530,7 @@ describe('Market', function () {
                     expect(event.args.couponsExpired).to.be.bignumber.equal(new BN(113721));
                     expect(event.args.lessDebt).to.be.bignumber.equal(new BN(5497));
                     expect(event.args.newBonded).to.be.bignumber.equal(new BN(0));
+                    expect(event.args.newTreasury).bignumber.zero;
                 });
             });
 
@@ -558,7 +561,8 @@ describe('Market', function () {
                     expect(event.args.epoch).to.be.bignumber.equal(new BN(12));
                     expect(event.args.couponsExpired).to.be.bignumber.equal(new BN(96728));
                     expect(event.args.lessDebt).to.be.bignumber.equal(new BN(10000));
-                    expect(event.args.newBonded).to.be.bignumber.equal(new BN(13298));
+                    expect(event.args.newBonded).to.be.bignumber.equal(new BN(12634));
+                    expect(event.args.newTreasury).bignumber.equal(new BN(664));
                 });
             });
         });

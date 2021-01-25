@@ -99,6 +99,10 @@ contract Getters is State {
         return dollar().totalSupply().sub(totalDebt());
     }
 
+    function treasury() public view returns (address) {
+        return Constants.getMultisigAddress();
+    }
+
     /**
      * Account
      */
