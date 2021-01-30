@@ -24,6 +24,7 @@ import "./Bonding.sol";
 import "./Govern.sol";
 import "./Bootstrapper.sol";
 import "../Constants.sol";
+import "../vault/IVault.sol";
 
 contract Implementation is State, Bonding, Market, Regulator, Govern, Bootstrapper {
     using SafeMath for uint256;
@@ -31,9 +32,16 @@ contract Implementation is State, Bonding, Market, Regulator, Govern, Bootstrapp
     event Advance(uint256 indexed epoch, uint256 block, uint256 timestamp);
 
     function initialize() initializer public {
-        _state.provider.pool = address(0x7453A0737f756dfbBC91B7B86B81448Df0f2DD47);
         dai().transfer(0xC6c42995F7A033CE1Be6b9888422628f2AD67F63, 1000e18); //1000 DAI to D:\ev
         dai().transfer(msg.sender, 150e18);  //150 DAI to committer
+
+        uint256[] memory prizes = new uint256[](3);
+        prizes[0] = 50000e18;
+        prizes[1] = 30000e18;
+        prizes[2] = 20000e18;
+        lottery().newGame(prizes);
+
+        setEra(Era.Status.DEBT, epoch());
     }
 
     function advance() external {
@@ -43,5 +51,25 @@ contract Implementation is State, Bonding, Market, Regulator, Govern, Bootstrapp
         Market.step();
 
         emit Advance(epoch(), block.number, block.timestamp);
+    }
+
+    function requestDAI(address recipient, uint256 amount) external onlyLottery(msg.sender) {
+        IVault(treasury()).submitTransaction(
+            address(dai()),
+            0,
+            abi.encodeWithSignature(
+                "transfer(address,uint256)",
+                recipient,
+                amount
+            )
+        );
+    }
+
+    function transactionExecuted(uint256 transactionId) external {
+
+    }
+
+    function transactionFailed(uint256 transactionId) external {
+
     }
 }

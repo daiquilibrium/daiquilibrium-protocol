@@ -84,6 +84,20 @@ contract Candidate {
     }
 }
 
+contract Era {
+    enum Status {
+        EXPANSION,
+        NEUTRAL,
+        DEBT
+    }
+
+    struct State {
+        Status status;
+        uint256 start;
+    }
+
+}
+
 contract Storage {
     struct Provider {
         IDollar dollar;
@@ -120,7 +134,12 @@ contract Storage {
         //storing twap for every epoch, in case we want to do something fancy in the future (e.g. calculating volatility)
         mapping(uint256 => Decimal.D256) twapPerEpoch;
     }
+
+    struct State8 {
+        Era.State era;
+    }
 }
+
 
 contract State {
     Storage.State _state;
@@ -130,4 +149,7 @@ contract State {
     
     //DAIQIP-6
     Storage.State6 _state6;
+
+    //DAIQIP-8
+    Storage.State8 _state8;
 }

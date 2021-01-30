@@ -35,17 +35,26 @@ contract Regulator is Comptroller {
         adjustPeriod(price);
         storePrice(epoch(), price);
 
+        (Era.Status currentEra,) = era();
+
         if (price.greaterThan(Decimal.one())) {
+            if (currentEra != Era.Status.EXPANSION)
+                setEra(Era.Status.EXPANSION, epoch());
             setDebtToZero();
             growSupply(price);
             return;
         }
 
         if (price.lessThan(Decimal.one())) {
+            if (currentEra != Era.Status.DEBT)
+                setEra(Era.Status.DEBT, epoch());
             decrementTotalRedeemable(totalRedeemable(), "Blockchain broke???????");
             shrinkSupply(price);
             return;
         }
+
+        if (currentEra != Era.Status.NEUTRAL)
+                setEra(Era.Status.NEUTRAL, epoch());
 
         emit SupplyNeutral(epoch(), currentEpochDuration());
     }

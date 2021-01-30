@@ -56,6 +56,15 @@ contract Permission is Setters {
         _;
     }
 
+    modifier onlyLottery(address account) {
+        Require.that(
+            account == Constants.getLotteryAddress(),
+            FILE,
+            "Account isn't the lottery"
+        );
+        _;
+    }
+
     modifier initializer() {
         Require.that(
             !isInitialized(implementation()),
