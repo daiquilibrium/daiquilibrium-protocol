@@ -262,6 +262,12 @@ describe('Regulator', function () {
             expect(await this.regulator.totalRedeemable()).to.be.bignumber.equal(new BN(this.expectedRewardCoupons));
           });
 
+          it('sets the correct era', async function () {
+            const era = await this.regulator.era();
+            expect(era["0"]).bignumber.zero;
+            expect(era["1"]).bignumber.zero;
+          });
+
           it('emits SupplyIncrease event', async function () {
             const event = await expectEvent.inTransaction(this.txHash, MockRegulator, 'SupplyIncrease', {});
 
@@ -354,6 +360,12 @@ describe('Regulator', function () {
             expect(await this.regulator.totalSupply()).to.be.bignumber.equal(new BN(0));
             expect(await this.regulator.totalCoupons()).to.be.bignumber.equal(new BN(0));
             expect(await this.regulator.totalRedeemable()).to.be.bignumber.equal(new BN(0));
+          });
+
+          it('sets the correct era', async function () {
+            const era = await this.regulator.era();
+            expect(era["0"]).bignumber.equal(new BN(2));
+            expect(era["1"]).bignumber.equal(new BN(7));
           });
 
           it('emits SupplyDecrease event', async function () {
@@ -511,6 +523,12 @@ describe('Regulator', function () {
           expect(await this.dollar.balanceOf(this.regulator.address)).to.be.bignumber.equal(new BN(1000000));
           expect(await this.dollar.balanceOf(poolAddress)).to.be.bignumber.equal(new BN(0));
         });
+
+        it('sets the correct era', async function () {
+            const era = await this.regulator.era();
+            expect(era["0"]).bignumber.equal(new BN(1));
+            expect(era["1"]).bignumber.equal(new BN(7));
+          });
 
         it('updates totals', async function () {
           expect(await this.regulator.totalStaged()).to.be.bignumber.equal(new BN(0));

@@ -20,6 +20,7 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./State.sol";
 import "../Constants.sol";
+import "../lottery/ILottery.sol";
 
 contract Getters is State {
     using SafeMath for uint256;
@@ -69,6 +70,10 @@ contract Getters is State {
 
     function pool() public view returns (address) {
         return _state.provider.pool;
+    }
+
+    function lottery() public view returns (ILottery) {
+        return ILottery(Constants.getLotteryAddress());
     }
 
     function dai() public view returns (IERC20) {
@@ -208,6 +213,10 @@ contract Getters is State {
 
     function shouldDistributeDAI() public view returns (bool) {
         return _state.epoch.shouldDistributeDAI;
+    }
+
+    function era() public view returns (Era.Status, uint256) {
+        return (_state8.era.status, _state8.era.start);
     }
 
     /**

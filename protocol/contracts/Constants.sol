@@ -88,6 +88,10 @@ library Constants {
         return address(0x0BCbDfd1ab7c2cBb6a8612f3300f214a779cb520);
     }
 
+    function getLotteryAddress() internal pure returns (address) {
+        return address(0x8Ee5b95C5676224bDb70115996F8674024355590);
+    }
+
     function getOracleReserveMinimum() internal pure returns (uint256) {
         return ORACLE_RESERVE_MINIMUM;
     }

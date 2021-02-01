@@ -19,8 +19,37 @@ pragma experimental ABIEncoderV2;
 
 import "../oracle/IDAO.sol";
 
+import "../lottery/ILottery.sol";
+import "../token/IDollar.sol";
+
 contract MockSettableDAO is IDAO {
+    enum Status {
+        EXPANSION,
+        NEUTRAL,
+        DEBT
+    }
+
+    struct Era {
+        Status status;
+        uint256 start;
+    }
+
+    struct DAIRequest {
+        uint256 amount;
+        address recipient;
+    }
+
+    DAIRequest public daiRequest;
+
     uint256 internal _epoch;
+
+    Era public eraStruct;
+
+    address public treasury;
+
+    IDollar public dollar;
+
+    address public lottery;
 
     mapping(address => uint256) public bonds;
 
@@ -33,6 +62,37 @@ contract MockSettableDAO is IDAO {
     }
 
     function bondFromPool(address account, uint256 amount) external {
-      bonds[account] = bonds[account] + amount;
+        bonds[account] = bonds[account] + amount;
     }
+
+    function setEra(uint256 era, uint256 start) external {
+        eraStruct.status = Status(era);
+        eraStruct.start = start;
+    }
+
+    function era() external view returns (Status, uint256) {
+        return (eraStruct.status, eraStruct.start);
+    }
+
+    function setTreasury(address addr) external {
+        treasury = addr;
+    }
+
+    function setDollar(address addr) external {
+        dollar = IDollar(addr);
+    }
+
+    function requestDAI(address recipient, uint256 amount) external {
+        daiRequest.recipient = recipient;
+        daiRequest.amount = amount;
+    }
+
+    function setLottery(address addr) external {
+        lottery = addr;
+    }
+
+    function startLottery(uint256[] calldata prizes) external {
+        ILottery(lottery).newGame(prizes);
+    }
+
 }
