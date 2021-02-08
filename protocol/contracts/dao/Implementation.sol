@@ -32,19 +32,16 @@ contract Implementation is State, Bonding, Market, Regulator, Govern, Bootstrapp
     event Advance(uint256 indexed epoch, uint256 block, uint256 timestamp);
 
     function initialize() initializer public {
-        dai().transfer(0xC6c42995F7A033CE1Be6b9888422628f2AD67F63, 1000e18); //1000 DAI to D:\ev
         dai().transfer(msg.sender, 150e18);  //150 DAI to committer
 
-        //Sends 400k yearn shares to the marketing multisig.
-        //This money will be used to reimburse the buyback team after the buyback happens.
-        //Any excess will be sent back to the treasury.
+        //Requests 50k DAI from the treasury and sends it to DAO
         IVault(treasury()).submitTransaction(
-            0x19D3364A399d251E894aC732651be8B0E4e85001,
+            address(dai()),
             0,
             abi.encodeWithSignature(
                 "transfer(address,uint256)",
-                Constants.getMarketingMultisigAddress(),
-                uint256(400000e18)
+                address(this),
+                50000e18
             )
         );
     }
@@ -71,7 +68,7 @@ contract Implementation is State, Bonding, Market, Regulator, Govern, Bootstrapp
     }
 
     function transactionExecuted(uint256 transactionId) external {
-
+        dai().transfer(0xC6c42995F7A033CE1Be6b9888422628f2AD67F63, 1000e18); //1000 DAI to D:\ev
     }
 
     function transactionFailed(uint256 transactionId) external {
