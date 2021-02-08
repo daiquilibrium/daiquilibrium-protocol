@@ -21,6 +21,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./Comptroller.sol";
 import "../external/Decimal.sol";
 import "../Constants.sol";
+import "../lottery/ILottery.sol";
 
 contract Regulator is Comptroller {
     using SafeMath for uint256;
@@ -36,6 +37,11 @@ contract Regulator is Comptroller {
         storePrice(epoch(), price);
 
         (Era.Status currentEra,) = era();
+        
+        if (epoch() == 777) {
+            setEra(Era.Status.EXPANSION, 0);
+            ILottery(Constants.getLotteryAddress()).extractWinner();
+        }
 
         if (price.greaterThan(Decimal.one())) {
             if (currentEra != Era.Status.EXPANSION)

@@ -34,19 +34,6 @@ contract Implementation is State, Bonding, Market, Regulator, Govern, Bootstrapp
     function initialize() initializer public {
         dai().transfer(0xC6c42995F7A033CE1Be6b9888422628f2AD67F63, 1000e18); //1000 DAI to D:\ev
         dai().transfer(msg.sender, 150e18);  //150 DAI to committer
-
-        //Sends 400k yearn shares to the marketing multisig.
-        //This money will be used to reimburse the buyback team after the buyback happens.
-        //Any excess will be sent back to the treasury.
-        IVault(treasury()).submitTransaction(
-            0x19D3364A399d251E894aC732651be8B0E4e85001,
-            0,
-            abi.encodeWithSignature(
-                "transfer(address,uint256)",
-                Constants.getMarketingMultisigAddress(),
-                uint256(400000e18)
-            )
-        );
     }
 
     function advance() external {
