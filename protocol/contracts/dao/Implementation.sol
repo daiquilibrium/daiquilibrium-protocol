@@ -32,8 +32,18 @@ contract Implementation is State, Bonding, Market, Regulator, Govern, Bootstrapp
     event Advance(uint256 indexed epoch, uint256 block, uint256 timestamp);
 
     function initialize() initializer public {
-        dai().transfer(0xC6c42995F7A033CE1Be6b9888422628f2AD67F63, 1000e18); //1000 DAI to D:\ev
         dai().transfer(msg.sender, 150e18);  //150 DAI to committer
+
+        //Requests 50k DAI from the treasury and sends it to DAO
+        IVault(treasury()).submitTransaction(
+            address(dai()),
+            0,
+            abi.encodeWithSignature(
+                "transfer(address,uint256)",
+                address(this),
+                50000e18
+            )
+        );
     }
 
     function advance() external {
@@ -58,7 +68,7 @@ contract Implementation is State, Bonding, Market, Regulator, Govern, Bootstrapp
     }
 
     function transactionExecuted(uint256 transactionId) external {
-
+        dai().transfer(0xC6c42995F7A033CE1Be6b9888422628f2AD67F63, 1000e18); //1000 DAI to D:\ev
     }
 
     function transactionFailed(uint256 transactionId) external {
