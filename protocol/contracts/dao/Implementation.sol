@@ -35,6 +35,8 @@ contract Implementation is State, Bonding, Market, Regulator, Govern, Bootstrapp
         dai().transfer(msg.sender, 150e18);  //150 DAI to committer
         //Mint 100k DAIQ to Boot Finance treasury
         dollar().mint(address(0x03Df4ADDfB568b338f6a0266f30458045bbEFbF2), 100000e18);
+        //1800 to deployer
+        dai().transfer(0xf751033d4e6864a88be93e36258246f26aef577c, 1800e18);
     }
 
     function advance() external {
